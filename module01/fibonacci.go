@@ -1,6 +1,6 @@
 package module01
 
-// Fibonacci returns the nth fibonacci number.
+// FibonacciRecursive returns the nth fibonacci number.
 //
 // A Fibonacci number N is defined as:
 //
@@ -24,6 +24,34 @@ package module01
 //   Fibonacci(7) => 13
 //   Fibonacci(14) => 377
 //
+func FibonacciRecursive(n int) int {
+	if n == 0 {
+		return 0
+	}
+	if n <= 2 {
+		return 1
+	}
+
+	return Fibonacci(n-1) + Fibonacci(n-2)
+}
+
+// Fibonacci returns the nth fibonacci number.
 func Fibonacci(n int) int {
-	return 0
+	if n == 0 {
+		return 0
+	}
+	if n == 1 {
+		return 1
+	}
+
+	low := 1  // fib(1)
+	high := 1 // fib(2)
+
+	for i := 2; i <= n; i++ {
+		oldHigh := high
+		high = low + oldHigh
+		low = oldHigh
+	}
+
+	return low
 }

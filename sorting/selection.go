@@ -41,7 +41,7 @@ func main() {
 	selectionSort(toSort)
 	fmt.Println(toSort)
 
-	toSort = []int{10, 3, 1, 2}
+	toSort = []int{10, 3, 1, 2, -4, -5, 4, 5, 7, -909, 304}
 	selectionSort(toSort)
 	fmt.Println(toSort)
 }

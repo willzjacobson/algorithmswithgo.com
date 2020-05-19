@@ -1,0 +1,82 @@
+COUNTING
+
+Rule of Sum and Product
+-=-=-=-
+Rule of sums: The number of waus to choose 1 element from 1 of 2 disjoint sets is the sum of the cardinatlities of the sets. That is, if A and B are 2 finite sets with no members in common, then |A u B| = |A|+|B|. For example, each position on a car's license plate is a letter or a digit. The number of posibilities for each position is therefore 26 + 10 = 36. 
+-=-=-=-
+Rule of product: The number of ways to choose an ordered pair is the number of ways to choose the first element times the number of ways to choose the second element. That is, if A and B are two finite sets, then |AxB| = |A|*|B|. For example, if an ice cream parlor offers 28 flavors and 4 topppings, the number of possible combinations is 28*4 = 112.
+
+Strings
+-=-=-=-
+A string over a finite set S is a sequence of elements of S. For example, there are 8 binary strings of length 3:  000, 001, 010, 011, 100, 101, 110, 111.
+A string of length k is a k-string.
+A substring s' of a string s is an ordered sequence of consecutive elements of s.
+-=-=-=-
+A k-substring of a string is a substring of a string of length k. For example, 010 is a 3-subsctrin of 01101001 (the substring begins at position 4).
+-=-=-=-
+There are |S|^k strings of length k. For example, the number of binary k-strings is 2^k. To construct a k-string over an n-set, we have n ways to pick the first element, n ways to pick the 2nd, etc. Thus, n^2 possible strings.
+
+Permutations
+-=-=-=-
+A permutation of a finite set S is an ordered sequence of all the elements of S, with each element appearing exactly once. If S={a, b, c}, then S has 6 permutations: abc,acb,bac,bca,cab,cba.
+There are n! permutations of a set of n elements.
+-=-=-=- 
+A k-permutation of S is an ordered seuqnce of k elements of S, with no element appearing more than once in the sequence (an ordinary permutation is thus an n-permutation over an n-set). The 12 2-permutations of the set {a, b, c, d} are ab, ac, ad, bs, bc, ca, cb, cd, da, db, dc.
+The number of k-mermutations of an n-set is n(n-1)(n-2)...(n-k+1) = n!/(n-k)! since we have n ways to choose the first element, n-1 ways to choose the second, and so on, until we have selected k elements, the last being a selection from the remaining n-1+1 elements.
+
+Combinations
+a k-combination of an n-set S is simply a k-subset of S. For example, the 4-set {a, b, c, d} has 6 2-combinations: ab,ac,ad,bc,bd,cd.
+We can express the number of k-combinations of an n-set in terms of the number of k-permutations of an n-set. Every k-combination has exactly k! permutations of its elements, each of which is a distinct k-permutation of the n-set. Thus, the number of k-combinations of an n-set is the number of k-permutations divided by k!: n!/(k!(n-k)!). 
+For k = 0; this formula tells us the number of ways to choose 0 elements from an n-set is 1 (not 0), since 0! = 1.
+
+Binomial coefficients
+The notation (n k) (read "n choose k") (the 'n' is actually written on top of the 'k') denotes the number of k-combinations of an n-set. Thus, from above we have: (n k) = n!/(k!(n-k)!)
+This formula is symmetric in k and n-k: (n k) = (n n-k)
+These numbers are also known as binomial coefficients, due to their appearance in the binomial expansion (i think we can stop here).
+
+
+PROBABILITY
+
+An event is a subset of sample space S. The event S is called a certain event, and the event 0 is called the null event. We say 2 events A and B are mutually exclusive if A intersection B is 0. By definition, all "elementary" events are mutually exclusive. 
+Axioms of probability:
+ - Pr{A} >= 0 for any event An
+ - Pr{S} = 1
+ - PR{A U B} = Pr{A} + Pr{B} for any 2 mutually exclusive events A and B.
+ - Pr{S} - Pr{A} = 1 - Pr{A} is the probablility of the "compliment" of A.
+ - Pr{A U B} = Pr{A} + Pr{B} - Pr{A n B} <= Pr{A} + Pr{B}.
+Ex. In a coin-flipping example where 2 coins are flipped 4 times, suppose each of the 4 elementary events is a probability 1/4. Then the probability of getting >=1 head is Pr{HH, HT, TH} = Pr{HH} + Pr{HT} + Pr{TH} = 3/4. Alternately, since the probablility of getting strictly <1 head is 1/4, the probability of getting >=1 head is 1 - 1/4 = 3/4.
+
+Discrete Probability Distributions (defined over a finite or countably infinite space)
+If space S is finite and every element s in S has probability 1/|S|, then we have the "uniform probability distribution" on S. Ex: "picking an element of S at random." If we flip a fair coin n times, we have the uniform probability distribution defined on the sample space S = {H,T}^n, a set of size 2^n. We can represent each elementary event in S as a string of length n over the set {H,T}, each string occurring with probability (1/2)^n. The event
+A = {exactly k heads and exactly n-k tails occur} 
+is a subset of S of size |A| = (n k), since (n k) strings of length n over {H,T} contain exactly k H's. The probability of event A is thus Pr{A} = (n k)/2^n.
+
+Continuous Uniform Probability Distribution
+For any closed interval [c,d] within the space [a,b] such that a <= c <= d <= b, the "continuous uniform probability distribution" defined the probablility of the event [c,d] to be:
+Pr{[c,d]} = (d-c)/(b-a). 
+Each point within [a,b] is equally likely, but the probability of each precise point is actually 0. Instead, we refer to events as ranges. 
+
+Conditional Probability and Independence
+Conditional probability formalizes the notion of having prior partial knowledge of the outcome of an experiment. The conditional probability of an event A given that another event B occurs is defined to be Pr{A|B} = Pr{A n B}/Pr{B} 
+wherever Pr{B} != 0. (We read “Pr{A|B}” as “the probability of A given B.”)
+Intuitively, since we are given that event B occurs, the event that A also occurs is A n B (A n B is the set of outcomes in which both A and B occur). We normalize the probabilities of all the elementary events in B by dividing them by Pr{B}, so they sum to 1 and thus are taken for granted as occurring. The conditional probability of A n B, therefore is the ratio of event A n B to the probability of event B. 
+Ex: a coin is flipped twice, and we're told the first flip is heads. If A is the event that both flips are heads, and B is the event that at least 1 coin is a head, PR{A|B}=(1/4)/(3/4) = 1/3.
+
+2 events are "independent" if Pr{A n B} = Pr{A}Pr{B}, which is equivalent (if Pr{B} != 0) to Pr{A|B} = Pr{A}.
+Ex: we flip 2 fair coins. Event A is that the first comes up H, and event B is that the 2 coins come up differently. Each of these events have a 1/2 chance of occuring, and there is a 1/4 chance they both occur. Thus, they are independent, and Pr{A|B} = Pr{A}.
+
+A collection A1, A2, ..., An of events is said to be "pairwise dependent" if
+Pr{Ai n Aj} = Pr{Ai}Pr{Aj}
+for all 1 <= i <= j <= n.
+
+We say that the events of the collection are "mutually independent" if every k-subset Ai, Ai2, ..., Aik of the collection, 
+where 2 <= k <= n and 1 <= i1 <= i2 < ... < ik <= n satisfies
+Pr{Ai1 n Ai2 n ... n Aik} = Pr{Ai1}Pr{Ai2}...Pr{Aik}.
+
+Ex. we flip 2 fair coins. Let A1 be the event that the 1st is H, A2 be the event that the 2nd is H, and A3 be the event that the 2 flips are different. We have:
+Pr{A1} = 1/2, Pr{A2} = 1/2, Pr{A3} = 1/2,
+Pr{A1 n A2} = 1/4, Pr{A1 n A3} = 1/4, Pr{A2 n A3} = 1/4,
+and Pr{A1 n A2 n A3} = 0.
+Since for 1 <= i <= j <= 3 we have Pr{Ai n Aj} = Pr{Ai}Pr{Aj} = 1/4, the events A1, A2, and A3 are pairwise independent. They are not mutually independent, however, because Pr{A1 n A2 n A3} = 1/8 != 0.
+
+Bayes Theorem

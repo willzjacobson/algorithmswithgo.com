@@ -79,4 +79,8 @@ Pr{A1 n A2} = 1/4, Pr{A1 n A3} = 1/4, Pr{A2 n A3} = 1/4,
 and Pr{A1 n A2 n A3} = 0.
 Since for 1 <= i <= j <= 3 we have Pr{Ai n Aj} = Pr{Ai}Pr{Aj} = 1/4, the events A1, A2, and A3 are pairwise independent. They are not mutually independent, however, because Pr{A1 n A2 n A3} = 1/8 != 0.
 
-Bayes Theorem
+Random Hiring Problem
+We interview candidates one-by-one, and replace the current worker with any applicant deemed better.
+Each time we hire has a cost. We want to estimate the total cost before hand. 
+Assuming that the candidates are presented in a random order, algorithm HIRE-ASSISTANT has an average-case total hiring cost of O(Ch ln n), where Ch is the cost of hiring someone. The probability that each candidate interviewed is better than all the previous candidates interviewed is 1/i, where i-1 is the number of candidates already interviewed. Sum that up from i=1 -> i=n, and that is equivalent to ln n. That's MUCH better than the worst case cost of O(Ch n), where each candidate is better than the last. 
+Rather than assuming the input is in random order, you can also randomize it before you start interviewing.

@@ -1,0 +1,86 @@
+
+Definitions
+ - In place: A sorting algorithm sorts "in place" if only a constant number of elements of the input array are ever stored outside the array.
+ - Comparison sorts: algorithms that determine the sorted order of an input array by comparing elements (quick, merge, bubble, insertion, heap, quick)
+ - Linear sorting: algorithms that treat the problem of sorting as a single large operation.
+ - Divide and Conquer: algorithms that partition the data to be sorted into smaller sets that can be independently sorted.
+
+Performance Considerations
+ - Comparisons and Swaps both have a cost
+ - Reducing either or both can improve performance
+ - The cost of both operations depends on many factors.
+
+Insertion Sort (linear)
+O(n^2) worst case
+O(n^2) average case
+O(n) best case
+Space required: O(n) (in place; linear space complexity)
+Loops are tight, so fast-paced for small sizes and nearly sorted data sets
+Summary:
+ - Sorts each item in the array as they are encountered 
+ - As the current item works from left to right
+  - Everything left of the item is known to be sorted
+  - Everything to the right is unsorted
+ - The current item is “inserted” into place within the sorted section
+
+Merge Sort (divide and conquer)
+O(nlong) worst case
+O(nlong) average case
+O(nlong) best case
+Can be, but is not generally performed in place. Hence, space required sometimes > O(n)
+Summary:
+ - The array is split in half recursively
+ - When the array is in groups of 1, it is reconstructed in sort order
+ - Each reconstructed array is merged with the other half
+
+Bubble Sort (linear)
+O(n^2) worst case
+O(n^2) average case
+O(n) best case (if already sorted)
+Space required: O(n) (in place)
+Performs well on small sample sizes that are already quite well sorted
+Summary:
+On Each Pass
+ - Compare each array item to it’s right neighbor
+ - If the right neighbor is smaller then Swap right and left
+ - Repeat for the remaining array items
+
+Selection Sort (linear)
+O(n^2) worst case
+O(n^2) average case
+O(n^2) best case
+Space required: O(n) (in place)
+Summary:
+ - Enumerate the array from the first unsorted item to the end
+ - Identify the smallest item
+ - Swap the smallest item with the first unsorted item
+
+Quick Sort (divide and conquer)
+O(n^2) worst case (not good for large inverse sorted data sets)
+O(nlogn) average case
+O(nlogn) best case
+Space required: O(n) (in place)
+Recursive algorthm, so stack space must be considered.
+Summary:
+ - Pick a pivot value and partition the array
+ - Put all values before the pivot to the left and above to the right
+ - The pivot point is now sorted – everything right is larger, everything left is
+smaller.
+ - Perform pivot and partition algorithm on the left and right partitions
+ - Repeat until sorted
+
+Heap Sort
+O(nlogn) worst case
+O(n) space complexity
+
+Counting Sort
+O(k+n) worst case (n elements to sort, k is the highest number present)
+O(k+n) average case 
+
+Radix Sort
+O(d(k+n)) worst case (n elements to sort, each item is a d-digit number, where each digit takes on k possible values)
+O(d(k+n)) average case 
+
+Bucket Sort
+O(n^2) worst case
+O(n) average case 

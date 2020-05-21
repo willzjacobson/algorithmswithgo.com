@@ -72,6 +72,7 @@ smaller.
 Heap Sort
 O(nlogn) worst case
 O(n) space complexity
+Heapsort is great, but a good implementation of quicksort usually beats it in practice. However, the underlying data structure (heap) is very useful. For example, for implementing priority queues.
 
 Counting Sort
 O(k+n) worst case (n elements to sort, k is the highest number present)

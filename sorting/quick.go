@@ -1,8 +1,50 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math/rand"
+)
 
-func quickSort(nums []int) {
+// Prefered solution
+func quickSort(nums []int, start, end int) {
+	if start < end {
+		// randomize which element we use as a pivot
+		// to prevent n^2 runtimes for sorted or inversely sorted inputs
+		p := rand.Intn(end-start) + start
+		nums[end], nums[p] = nums[p], nums[end]
+
+		// all values in 'nums' < nums[pivot] go to the left of pivot,
+		// all values in 'nums' > nums[pivot]go to the left of pivot.
+		pivot := partition(nums, start, end)
+
+		// Sort subarrays to the left and right of pivot
+		quickSort(nums, start, pivot-1)
+		quickSort(nums, pivot+1, end)
+	}
+}
+
+func partition(nums []int, start, end int) int {
+	comp := nums[end]
+	pivot := start - 1
+	// Loop through to partially order the subarray, and determine where pivot should be
+	for i := start; i < end; i++ {
+		if nums[i] < comp {
+			nums[i], nums[pivot+1] = nums[pivot+1], nums[i]
+			pivot++
+		}
+	}
+
+	// Put pivot element in its correct spot
+	nums[end], nums[pivot+1] = nums[pivot+1], nums[end]
+	return pivot + 1
+}
+
+// -=-=-=-=-=-
+
+// This solution is NOT 'in place'
+// The 2nd and 3rd params aren't actually used,
+// it was just convenient for the 2 quicksort implementations to have the same signature for testing
+func quickSortSimple(nums []int, start, end int) {
 	if len(nums) <= 1 {
 		return
 	}
@@ -23,8 +65,8 @@ func quickSort(nums []int) {
 			higher = append(higher, v)
 		}
 	}
-	quickSort(lower)
-	quickSort(higher)
+	quickSortSimple(lower, start, end)
+	quickSortSimple(higher, start, end)
 
 	// compose fully sorted array
 	sorted := append(lower, append([]int{mid}, higher...)...)
@@ -35,31 +77,37 @@ func quickSort(nums []int) {
 }
 
 func main() {
+	testSorting(quickSortSimple)
+	fmt.Println("-=-=-=-=-=-")
+	testSorting(quickSort)
+}
+
+func testSorting(f func([]int, int, int)) {
 	toSort := []int{}
-	quickSort(toSort)
+	f(toSort, 0, len(toSort)-1)
 	fmt.Println(toSort)
 
 	toSort = []int{1}
-	quickSort(toSort)
+	f(toSort, 0, len(toSort)-1)
 	fmt.Println(toSort)
 
 	toSort = []int{1, 2, 3}
-	quickSort(toSort)
+	f(toSort, 0, len(toSort)-1)
 	fmt.Println(toSort)
 
 	toSort = []int{3, 2, 1}
-	quickSort(toSort)
+	f(toSort, 0, len(toSort)-1)
 	fmt.Println(toSort)
 
 	toSort = []int{5, 3, 5, 3, 5}
-	quickSort(toSort)
+	f(toSort, 0, len(toSort)-1)
 	fmt.Println(toSort)
 
 	toSort = []int{3, 5, 3, 5, 3}
-	quickSort(toSort)
+	f(toSort, 0, len(toSort)-1)
 	fmt.Println(toSort)
 
 	toSort = []int{10, 3, 1, 2, -4, -5, 4, 5, 7, -909, 304}
-	quickSort(toSort)
+	f(toSort, 0, len(toSort)-1)
 	fmt.Println(toSort)
 }

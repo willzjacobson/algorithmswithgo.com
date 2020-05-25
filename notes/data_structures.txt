@@ -10,3 +10,40 @@ INCREASE-KEY(S,x,k) increases the value of element x’s key to the new value k,
 Alternatively, a min-priority queue supports the operations INSERT, MINIMUM, EXTRACT-MIN, and DECREASE-KEY.
 A min-priority queue can be used in an event-driven simulator. The events must be simulated in order of their time of occurrence, because the simulation of an event can cause other events to be simulated in the future.
 In summary, a heap can support any priority-queue operation on a set of size n in O(lg n) time.
+
+Stacks
+LIFO (last in first out)
+common operations (each take O(1) time):
+INSERT: push to top
+DELETE: pop off of the top
+STACK-EMPTY: returns whether or not the stack is empty
+
+Queues
+FIFO (first in first out)
+Has a "head" and "tail" property to keep track of where we are in the underlying array.
+common operations (each take O(1) time):
+ENQUEUE (insert)
+DEQUEUE (delete)
+
+Linked List
+Contains objects that are arranged in linear order, which is maintained by pionters in each object.
+In a "doubly linked list", each object contains a pointer to the next and previous objects. "Singly linked" lists have no "prev" pointer.
+Lists can be sorted, unsorted, or circular (tail points to head and vice versa)
+LIST-SEARCH(x) operation runs in O(n) time, and retuens a pointer to an object
+LIST-INSERT splices an object to the front of the list. Runs in O(1) (constant) time.
+LIST-DELETE(x) first calls LIST-SEARCH to get a pointer to the object, then removes it from the list. Runs in O(n) time due to the search.
+Using a sentinel "L.nil" for list L allows us to simplify the code by letting us get rid of L.head and L.tail.  Instead, the list becomes circular. In an empty list, L.nil.next = L.nil and L.nil.prev = L.nil.  The last object in the list has next - L.nil, and the first has prev - L.nil.
+TODO: Implement the "3 array" approach for modeling a linked list in a language without a pointer data type (p.244 of Intro to Algorithms).
+
+-=-=- Representing Rooted Trees by linked data structures
+We represent each node with an object containing a key and pointers to other nodes.
+-=-=- Binary Trees
+Each node has a "p" (parent), "left", and "right" pointer. The root of the tree T is T.root. If node.p is nil, it is the root.
+-=-=- Rooted trees with unbounded branching
+Each node has the attributes node.p (parent - up), node.leftChild (down), and node.rightSibling (sideways).
+A given node does not actually know how many children or siblings it has.
+This implementation has the advantage of only using O(n) space for any n-noded tree.
+-=-=-
+There are other possible representations too. For example, sometimes nodes only need a pointer to the parent (ch.21). We can also represent a max or min heap (a complete binary tree) as a single array.
+
+Hash Tables

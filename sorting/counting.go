@@ -1,15 +1,6 @@
 package main
 
-import (
-	"fmt"
-)
-
-// COME BACK TO THIS
-func RadixSort(nums []string, d int) {
-	for i := d - 1; i >= 0; i-- {
-
-	}
-}
+import "fmt"
 
 // CountingSort will sort a list of integers using the counting sort algorithm.
 //
@@ -42,7 +33,31 @@ func CountingSort(nums []int, k int) {
 }
 
 func main() {
-	toSort := []string{"178", "399", "112", "202", "434", "583", "723", "533", "201"}
-	RadixSort(toSort, 3)
+	toSort := []int{}
+	CountingSort(toSort, 0)
+	fmt.Println(toSort)
+
+	toSort = []int{1}
+	CountingSort(toSort, 1)
+	fmt.Println(toSort)
+
+	toSort = []int{1, 2, 3}
+	CountingSort(toSort, 3)
+	fmt.Println(toSort)
+
+	toSort = []int{3, 2, 1}
+	CountingSort(toSort, 3)
+	fmt.Println(toSort)
+
+	toSort = []int{5, 3, 5, 3, 5}
+	CountingSort(toSort, 5)
+	fmt.Println(toSort)
+
+	toSort = []int{3, 5, 3, 5, 3}
+	CountingSort(toSort, 5)
+	fmt.Println(toSort)
+
+	toSort = []int{10, 3, 1, 2, 4, 5, 7, 5, 2}
+	CountingSort(toSort, 10)
 	fmt.Println(toSort)
 }

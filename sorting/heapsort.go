@@ -37,4 +37,8 @@ func main() {
 	// toSort = []int{10, 3, 1, 2, -4, -5, 4, 5, 7, -909, 304}
 	// HeapSortInt(toSort)
 	// fmt.Println(toSort)
+
+	// toSort = []int{4, 1, 3, 2, 16, 9, 10, 14, 8, 7}
+	// HeapSortInt(toSort)
+	// fmt.Println(toSort)
 }

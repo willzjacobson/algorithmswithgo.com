@@ -10,7 +10,11 @@ Performance Considerations
  - Reducing either or both can improve performance
  - The cost of both operations depends on many factors.
 
-Insertion Sort (linear)
+-=- Comparison Sorting Methods
+They work by comparing one value in a collection against another
+The best these can do under worst case conditions is nlogn
+
+Insertion Sort
 O(n^2) worst case
 O(n^2) average case
 O(n) best case
@@ -33,7 +37,7 @@ Summary:
  - When the array is in groups of 1, it is reconstructed in sort order
  - Each reconstructed array is merged with the other half
 
-Bubble Sort (linear)
+Bubble Sort
 O(n^2) worst case
 O(n^2) average case
 O(n) best case (if already sorted)
@@ -45,7 +49,7 @@ On Each Pass
  - If the right neighbor is smaller then Swap right and left
  - Repeat for the remaining array items
 
-Selection Sort (linear)
+Selection Sort
 O(n^2) worst case
 O(n^2) average case
 O(n^2) best case
@@ -56,10 +60,16 @@ Summary:
  - Swap the smallest item with the first unsorted item
 
 Quick Sort (divide and conquer)
-O(n^2) worst case (not good for large inverse sorted data sets)
+O(n^2) worst case 
+  not good for inverse sorted, or sorted data sets, as these result in unbalanced partitioning
+  since this is common in engineering scenarios, we ramdomize the placement of the pivot in the array to partition
 O(nlogn) average case
+  much closer to the best case than the worst case,
+  as even a 99-1 split runs asymtotically in nlogn time. Only a 100-0 split runs in n^2 time
 O(nlogn) best case
+  occurs with balanced partitioning, which results in 2 arrays of length <= n/2
 Space required: O(n) (in place)
+Often the best choice, as the expected time is nlogn and the hidden constant factors are small
 Recursive algorthm, so stack space must be considered.
 Summary:
  - Pick a pivot value and partition the array
@@ -72,16 +82,38 @@ smaller.
 Heap Sort
 O(nlogn) worst case
 O(n) space complexity
-Heapsort is great, but a good implementation of quicksort usually beats it in practice. However, the underlying data structure (heap) is very useful. For example, for implementing priority queues.
+Heapsort is great, but a good implementation of quicksort usually beats it in practice. 
+However, the underlying data structure (heap) is very useful. For example, for implementing priority queues.
+
+-=- Linear Sorting Methods
+Work by means other than just comparing values
+Thus, the lower bound of nlogn that plagues comparison sorting methods does not apply. 
 
 Counting Sort
-O(k+n) worst case (n elements to sort, k is the highest number present)
+Use case: have n integers to sort, where the integers rangs from 0 to k
+O(k+n) worst case
 O(k+n) average case 
+Performs the best where k is low compared to n
+Counting sort is "stable", meaning that the order of elements with the same value is not changed. This is important in cases where satelite data is carried along with the value we're sorting on. It is also useful because it allows counting sort to be used as a subroutine in radix sort. 
 
 Radix Sort
-O(d(k+n)) worst case (n elements to sort, each item is a d-digit number, where each digit takes on k possible values)
-O(d(k+n)) average case 
+Use case: n elements to sort, each item is a d-digit number, where each digit takes on k possible values. Used by old card sorting machines. Useful when we want to sort information that is keyed by multiple fields. For example, dates by 3 keys: year, month, and day.
+O(d(k+n)) worst case
+O(d(k+n)) average case
+Summary:
+Use a stable sort to sort on the least significant field. Then do the same on the 2nd least significant field, etc. ... through the most significant field. 
+Is radix sort faster than quicksort? Sometimes. But the constants are higher in radix sort, and quick can be faster. And radix sort it is not in place, so quicksort can be better when memory storage is at a premium.
+UNABLE TO IMPLEMENT -- RETURN TO THIS
 
 Bucket Sort
-O(n^2) worst case
-O(n) average case 
+Assumes the unput is drawn from a uniform distribution between 0 and 1 (I assume you could normalize data that is of uniform distribution but not between 0 and 1) (this assumption allows it to be fast).
+O(n^2) worst case (basically becomes worst case insertion sort)
+O(n) average case
+Even if the input is not of uniform distribution, bucket sort will still run in linear time if the sum of the quares of the bucket sizes is linear in the total number of elements. 
+Summary:
+Let b[0..n-1] be a new array of empty linked lists
+for i = 1 to n
+  insert A[i] into list b[n*A[i]]
+for i=0 to n-1
+  sort list in b[i] using insertion sort
+concatinate the lists b[0]...b[n-1] together in order

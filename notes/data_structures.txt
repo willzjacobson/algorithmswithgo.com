@@ -29,9 +29,10 @@ Linked List
 Contains objects that are arranged in linear order, which is maintained by pionters in each object.
 In a "doubly linked list", each object contains a pointer to the next and previous objects. "Singly linked" lists have no "prev" pointer.
 Lists can be sorted, unsorted, or circular (tail points to head and vice versa)
-LIST-SEARCH(x) operation runs in O(n) time, and retuens a pointer to an object
+LIST-SEARCH(x) operation runs in O(n) time, and returns a pointer to an object
 LIST-INSERT splices an object to the front of the list. Runs in O(1) (constant) time.
-LIST-DELETE(x) first calls LIST-SEARCH to get a pointer to the object, then removes it from the list. Runs in O(n) time due to the search.
+LIST-DELETE(x) O(n) for singly linked list, O(1) for doubly linked list
+  If singly linked, you have to traverse the list to find the node whose 'next' attribute points to the cell to remove, to change that next value. 
 Using a sentinel "L.nil" for list L allows us to simplify the code by letting us get rid of L.head and L.tail.  Instead, the list becomes circular. In an empty list, L.nil.next = L.nil and L.nil.prev = L.nil.  The last object in the list has next - L.nil, and the first has prev - L.nil.
 TODO: Implement the "3 array" approach for modeling a linked list in a language without a pointer data type (p.244 of Intro to Algorithms).
 
@@ -47,3 +48,168 @@ This implementation has the advantage of only using O(n) space for any n-noded t
 There are other possible representations too. For example, sometimes nodes only need a pointer to the parent (ch.21). We can also represent a max or min heap (a complete binary tree) as a single array.
 
 Hash Tables
+Supports INSERT, SEARCH, and DELETE (sufficient for many applications). 
+Search can take O(n) time in the worst cases, but generally performs in O(1).
+A hash table is a generalization of the simpler notion of an array. In an arrray, we directly address each key into a slot in the array. A hash table is useful when the number of keys stored is small relative to the total number of possible keys. A hash table uses an array of size proportional to the number of keys actually stored. Instead of using keys as array indexes directly, the array index is computed from the key. To handle collisions, we "chain" keys within each index. 
+-=-=- Direct-address Tables
+Works well when the number of keys is reasonably small. Can use an array of a "direct-address table", where each position/slot corresponds to a key.
+Each operation takes O(1) time on average
+DIRECT-ADDRESS-SEARCH(T,k) 
+  return T[k]
+DIRECT-ADDRESS-INSERT(T,x)
+  T[x.key] = x
+DIRECT-ADDRESS-DELETE(T,x)
+  T[x.key] = nil
+-=-=- Hash Tables
+If the universe of possible keys is large, storing them in a direct address table (a map or array) may be impractical. And if not all of the keys are actually stored in the data structure, allocating a free slot for each could waste space. 
+With direct addressing, an element with key k is stored in slot k. With hashing, this element is stored in slot h(k), where h is a "hash function". h maps the universe of possible keys U into the slots of a hash table T[0...m-1], where m (the size of the hash table) is typically much smaller than U.
+We say "an element with k k hashes to slot h(k)", and "h(k) is the hash value of key k".
+Collisions
+We call it a "collision" when multiple keys hash to the same slot. We handle this by placing a linked list in each slot. The dictionary oprtations are thus:
+CHAINED-HASH-INSERT(T,x) (worst case O(1))
+  insert x at the head of list T[h(x.key)]
+CHAINED-HASH-SEARCH(T,k) (worst case O(n), avg case O(1))
+  search for an element with key k in list T[h(k)]
+CHAINED-HASH-DELETE(T,x) (worst case O(1) if lists are doubly linked, otherwise O(n) bc would have to search for the element first)
+  delete x from the list T[h(x.key)]
+We call the number of keys in each list the "load factor" a. a is the same in all slots, given "simple uniform hashing".
+TODO: implement a hash table
+-= Analysis of hashing with chaining
+Under assumption of simple uniform hashing:
+Unsuccessful search takes average time of O(1+a) (where a is the load factor = n/m)
+Successful search also takes average time of O(1+a)
+Since a = n/m and we grow m proprtionally with n, these operations are effectively done in constant time.
+-=-=- Hash Functions
+A good hashing function approxiately satisfies the assumption of "simple uniform hashing": each key is equally likely to hash to any of the m slots, idependently of where any other key has hashed to. 
+Sometimes we actually want keys that are close to yield hash values that are far apart (for ex, when using "linear probing"). "Universal hashing" accomplishes this.
+We often represnt keys as naturan numbers. For example, if the key is a string, we represent it in a suitable radix notation. For example, if the key is "pt", we can interpret it as a pair of decimal integers (112, 116), since in ASCII, p=112 and t=116. Then, expressed as a radix integer, the key "pt" becomes 112*128 + 116 = 11452.
+-=- The division method
+Divide x.key by m - 1. The remainder is the slot x goes into. Thus, the hash function h(k) = k mod m.
+When using this method, m should not be a power of 2, since if m = 2^p, h(k) is just the p lowest-order bits of k. 
+m = 2^p - 1 when k is a character string interpreted in radix 2^p is also a poor choice, since permuting the chatacters of k won't change h(k).
+A prime not too lcose to an exact power of 2 is often a good choice for m. For example, if n=2000 and 3 is an acceptable load factor, we can choose m=701, because it's prime and near and near 2000/3, but not near any power of 2. h(k) would then be: k mod 701.
+-=- The Multiplication method
+h(k) = floor(m * (kA mod 1))
+2 steps:
+ 1. multiply the key k by a constant A where 0 < A < 1, and extract the fractional part of kA.
+ 2. Multiply this by m and take the floo of the result.
+Advantage of this method is that m is not crucial. We usually choose m to be some power of 2, as it allows for slicker implementation.
+A = (sqrt(5) - 1)/2 ~ 0.618 works well.
+-=- Universal hashing
+If a sneaky person controls your set of unique keys, they could fix them such that they all hash to the same slot, and -> O(n) time for search and delete operations. We can avoid this by choosing the hash function randomly. This approach is called universal hashing.
+Let H be a finite collection of hash functions that map universe U of keys into the range {0,1,...m-1}. Such a collection is said to be "universal" if for any hash function h randomly chosen from H, the chance of a collisions between distinct keys is no more than 1/m (the chance of randomly selecting the same slot twice). 
+You can design a universal class of hash functions by generating a set of module-based functions using number theroy.
+-=-=- Open addressing
+In open addressing, all elements ocupy the hash table itself. Each table entry contains either an element of the dynamic set or nil, rather than a chain of elements. Thus, with open addressing, a table can "fill up"; load factor cannot be > 1. 
+The advantage of open addressing is that it does not require pointers. The extra memory allows us to have a larger tables. Instead of following pointers, we must compute the sequence of slots to be examined. 
+To perform insertion, we succssively "probe" the table untilwe find an empty slot. The sequence of positions probed depends on the key being inserted. Thus, to determins which slots to probe, we extend the hash function to include the probe number (0,1,...m-1). Every table position is eventually checked, though not necessarily in order.
+Operations (implemented as if the key is the entire object):
+-= HASH-INSERT(T,k)
+from i = 0 -> i = m
+  j = h(k,i)
+  if T[j] == NIL
+    T[j] = k
+    return j // return index at which the key will be found
+  else i++
+error “hash table overflow”
+-= HASH-SEARCH(T,k)
+i = 0
+repeat
+  j = h(k,i)
+  if T[j] == k
+    return j // return index at which the key will be found
+  i++
+until T[j] == nul or i == m
+return nil
+-= Deletion is difficult, since if we replace an element with nil, the sequence traversed when searching for another element could break. Thus, we use a value other than nil to indicate "deleted". However, this make search times no longer depend on the load factor. That's why chaining is more commonly used when we need deletion functionality. 
+For open addressing to work, we assume "uniform hashing": the probe sequence of each key is equally likely to me any of the m! permitations of {0,1,...,m-1}. This extends "simple uniform hashing" from above to define a hash functin that produces not just a single number, but a sequence of numbers.
+True uniform hashing is hard. 3 common techniques for comupting probe sequences for open addressing are: linear probing, quadratic probing, and double hashing. Double hashing seems to work best. 
+-=- analysis of open addressing (assuming uniform hashing)
+Given an open-address hash table with load factor a = n/m < 1, the expected number of probes in an unsuccessful search is at most 1/(1-a). That's 2n a half full table, 10 in a table 90% full.
+Inserting an element into an open-address hash table with load factor a requires at most 1/(1-a) probes on average.
+Given an open-address hash table with load factor a<1, the expected number of probes in a a successful search is at most (1/a)*ln(1/(1-a)). Half full: 1.287 probes. If 90% full, 2.559 searches.
+-=-=- Perfect Hashing
+We cll a hashing technique "perfect hashing" if O(1) memory accesses are requierd to perform a search in the work case. This can be done if the set of keys is status (once the keys are stored in the table, they don't change).
+To reate a perfect hashing scheme, we use 2 levels of hashing, with universal hashing at each level: 
+  1) The first level is the same as for hashing with chaining: hash the n keys into m slots using hash function h carefully chosen from a family of universal hash functions. 
+  2) Intead of making a linked list of the keys hashing to slot j, we use a small secondary hash table with an associated hash function. By choosing the hash functions carefully, we can guarantee there are no collisions in the secondary level. In order to ensure no collisions, the size of the inner hash table must be the square of the number of keys hashing to slot j. This seems like it would require a lot of memory, but it turns out to be only O(n) for the primary hash table and each secondary hash table.
+
+SEARCH TREES
+Supports many dynamic set properties, including SEARCH, MINIMUM, MAXIMUM, PREDECESSOR, SUCCESSOR, INSERT, and DELETE. Generally, these opertations can be performed in best case O(logn) and worst case O(n)
+Thus, we can use a search tree both as a dictionary and as a priority queue.
+
+Binary Search Trees
+Each node is an object containing satellite data, and attribute left, right, and p (parent).
+For any node x, the keys in the left subtree are at most x.key, and the keys in the right subtree are at least x.key.
+Te worst case running time for most search-tree operations is proportional to the height of the tree. 
+INORDER-TREE-WALK(x)  // print all nodes in non decreasing order (O(n) time)
+if x != nil 
+  INORDER-TREE-WALK(x.left)
+  print x.key
+  INORDER-TREE-WALK(x.right)
+PREORDER-TREE-WALK(x) // print the root before the values in either tree
+PREORDER-TREE-WALK(x) // print the root after the values in either tree
+TREE-SEARCH-RECURSIVE(x, k) // O(h) where h is the height of the tree, since we traverse a simple path down the tree
+  if x == nil or k == x.key
+    return x
+  if k < x.key
+    return TREE-SEARCH(x.left, k)
+  return TREE-SEARCH(x.right, k)
+TREE-SEARCH(x, k) // Also O(h), but more efficient on most computers
+  while x != nil and k != x.key
+    if k < x.key
+      x = x.left
+    else x = x.right
+  return x
+TREE-MINIMUM(x) // return a pointer to the minimum element in the subtree rooted at node x
+  while x.left
+    x = x.left
+  return x
+TREE-MAXIMUM(x) // return a pointer to the maximum element in the subtree rooted at node x
+  while x.right
+    x = x.right
+  return x
+-=-
+Sometimes we need to find a node's succesor in the sorted order determined by an inorder tree walk. If all keys are distinct, the successor of a node is the node with the smallest key greater than x.key. 
+TREE-SUCCESSOR(x) {
+  if x.right != nil
+    return TREE-MINIMUM(x.right)
+  // if node has no right child, it's successor is its lowest ancestor whose left child is also an ancestor.
+  y = x.p
+  while y != nil and x == y.right
+    x = y
+    y = y.p
+  return y
+}
+TREE-PRECESSOR(x) {
+  if x.left != nil
+    return TREE-MAXIMUM(x.left)
+  // if node has no left child, it's successor is its lowest ancestor whose right child is also an ancestor.
+  y = x.p
+  while y != nil and x == y.left
+    x = y
+    y = y.p
+  return y
+}
+-=- Insertion
+TREE-INSERT(T,z)
+  y = nil
+  x = T.root
+  while x != nil
+    y = x  // trailing pointer to keep track of parent
+    if z.key < x.key
+      x = x.left
+    else x = x.right
+  z.p = y // assign parent
+  // assign node as another node's child
+  if y == nil
+    T.root = z  // empty tree
+  else if z.key < y
+    y.left = z
+  else y.right = z
+-=- Deletion
+3 cases:
+  1) if z has no children, remove it by modifying parent to replace z with nil as its child.
+  2) if z has one, then we elevate that child to take z's position in the tree by modifying z's parent to replace z with z's child.
+  3) if z has 2 children, we find z's successor y (in z's right subtree) and have y take z's posotion in the tree. The rest of z's right subtree becomes y's new right subtree, and z's left subtree becomes y's new left subtree. This is tricky, as it matters whether y is z's right or left child.
+  

@@ -212,4 +212,40 @@ TREE-INSERT(T,z)
   1) if z has no children, remove it by modifying parent to replace z with nil as its child.
   2) if z has one, then we elevate that child to take z's position in the tree by modifying z's parent to replace z with z's child.
   3) if z has 2 children, we find z's successor y (in z's right subtree) and have y take z's posotion in the tree. The rest of z's right subtree becomes y's new right subtree, and z's left subtree becomes y's new left subtree. This is tricky, as it matters whether y is z's right or left child.
-  
+---
+TRANSPLANT(T,u,v)  // helper function used in node deletion. Replaces one subtree (u) as a child of its parent with another subtree (v)
+if u.p == nil  // u is root of T
+  T.root = v
+else if u == u.p.left  // u is a left child
+  u.p.left = v
+else u.p.right = v  // u is a right child
+if v != nil
+  v.p = u.p
+---
+TREE-DELETE(T,z)  // the actual delete function
+if z.left == nil
+  TRANSPLANT(T, z, z.right)  // no left child; replace node with its right child
+else if z.right == nil
+  TRANSPLANT(T, z, z.left)  // no right child; replace node with its left child
+else y = TREE-MINIMUM(z.right)  // find successor of the node's right subtree
+  if y.p != z  // case where the z's successor is NOT its right child; swap it with z's right child
+    TRANSPLANT(T, y, z.right)
+    y.right = z.right
+    r.pright.p = y
+  TRANSPLANT(T,z,y)  // swap z with (what we now know to be) its right child
+  y.left = z.left
+  y.left.p = y
+TODO: Implement the above operations for a binary search tree.
+
+Red Black Trees
+If the hieght of a binary search tree is large, the operations may run more like O(n) like a linked list. Red-black trees are one of many trees that are "balanced" to guarantee operations take O(logn) time in the worst case.
+Red-black tree nodes have a color attribute, as well as p, left, right, key. By constraining node colors on any simple path from root to leaf, red-black trees ensure that no such path is > twice as long as any other, so the tree is balancedish.
+If a child or parent node doesn't exist, it is said to point to T.Nil (a sentinel), which is said to be black.
+RB tree properties:
+ - every node is either red or black
+ - the root is black
+ - every leaf (Nil) is black
+ - if a node is red, then both its children are black
+ - For each node, all simple paths from the node to descendant leaves contain the same number of black nodes.
+These 5 properties must be maintained during insertion and deletion.
+TODO: Implement a RB tree.

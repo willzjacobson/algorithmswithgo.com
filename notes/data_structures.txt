@@ -33,7 +33,7 @@ LIST-SEARCH(x) operation runs in O(n) time, and returns a pointer to an object
 LIST-INSERT splices an object to the front of the list. Runs in O(1) (constant) time.
 LIST-DELETE(x) O(n) for singly linked list, O(1) for doubly linked list
   If singly linked, you have to traverse the list to find the node whose 'next' attribute points to the cell to remove, to change that next value. 
-Using a sentinel "L.nil" for list L allows us to simplify the code by letting us get rid of L.head and L.tail.  Instead, the list becomes circular. In an empty list, L.nil.next = L.nil and L.nil.prev = L.nil.  The last object in the list has next - L.nil, and the first has prev - L.nil.
+Using a sentinel "L.nil" for list L allows us to simplify the code by letting us get rid of L.head and L.tail.  Instead, the list becomes circular. In an empty list, L.nil.next = L.nil and L.nil.prev = L.nil.  The last object in the list has next = L.nil, and the first has prev = L.nil.
 TODO: Implement the "3 array" approach for modeling a linked list in a language without a pointer data type (p.244 of Intro to Algorithms).
 
 -=-=- Representing Rooted Trees by linked data structures

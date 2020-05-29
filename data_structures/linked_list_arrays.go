@@ -3,7 +3,7 @@ package main
 import "fmt"
 
 // LinkedList : Implementing a linked list using 3 arrays
-type LinkedList struct {
+type LinkedListArrays struct {
 	next []int
 	key  []int
 	prev []int
@@ -12,10 +12,10 @@ type LinkedList struct {
 	free int
 }
 
-// CreateLinkedList : Creates a LinkedList instance
-func CreateLinkedList() *LinkedList {
+// CreateLinkedListArrays : Creates a LinkedList instance
+func CreateLinkedListArrays() *LinkedListArrays {
 	null := -1
-	return &LinkedList{
+	return &LinkedListArrays{
 		free: null,
 		head: null,
 		null: null,
@@ -23,7 +23,7 @@ func CreateLinkedList() *LinkedList {
 }
 
 // Search : return the index containing the specified key
-func (l *LinkedList) Search(x int) int {
+func (l *LinkedListArrays) Search(x int) int {
 	n := l.head
 	for n != l.null && l.key[n] != x {
 		n = l.next[n]
@@ -33,7 +33,7 @@ func (l *LinkedList) Search(x int) int {
 }
 
 // Insert : insert a new "node"
-func (l *LinkedList) Insert(x int) {
+func (l *LinkedListArrays) Insert(x int) {
 	newHead := l.allocateObject()
 	if l.head != l.null {
 		l.prev[l.head] = newHead
@@ -45,7 +45,7 @@ func (l *LinkedList) Insert(x int) {
 }
 
 // allocateObject : find or create a free slot to put a new "node"
-func (l *LinkedList) allocateObject() int {
+func (l *LinkedListArrays) allocateObject() int {
 	if l.free == l.null {
 		// Either brand new list instance, or no space remaining
 		// In either case, create a new index, and return it
@@ -62,7 +62,7 @@ func (l *LinkedList) allocateObject() int {
 }
 
 // Delete : delete "node" at a particular index
-func (l *LinkedList) Delete(x int) {
+func (l *LinkedListArrays) Delete(x int) {
 	if len(l.key) < x+1 {
 		panic("list underflow")
 	}
@@ -84,7 +84,7 @@ func (l *LinkedList) Delete(x int) {
 }
 
 // freeObject : mark an index free
-func (l *LinkedList) freeObject(x int) {
+func (l *LinkedListArrays) freeObject(x int) {
 	l.key[x] = l.null
 	l.prev[x] = l.null
 	l.next[x] = l.free
@@ -92,7 +92,7 @@ func (l *LinkedList) freeObject(x int) {
 }
 
 func main() {
-	l := CreateLinkedList()
+	l := CreateLinkedListArrays()
 	l.Insert(1)
 	l.Insert(2)
 	l.Insert(3)

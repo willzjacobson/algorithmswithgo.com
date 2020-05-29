@@ -73,7 +73,6 @@ CHAINED-HASH-SEARCH(T,k) (worst case O(n), avg case O(1))
 CHAINED-HASH-DELETE(T,x) (worst case O(1) if lists are doubly linked, otherwise O(n) bc would have to search for the element first)
   delete x from the list T[h(x.key)]
 We call the number of keys in each list the "load factor" a. a is the same in all slots, given "simple uniform hashing".
-TODO: implement a hash table
 -= Analysis of hashing with chaining
 Under assumption of simple uniform hashing:
 Unsuccessful search takes average time of O(1+a) (where a is the load factor = n/m)
@@ -92,7 +91,7 @@ A prime not too lcose to an exact power of 2 is often a good choice for m. For e
 h(k) = floor(m * (kA mod 1))
 2 steps:
  1. multiply the key k by a constant A where 0 < A < 1, and extract the fractional part of kA.
- 2. Multiply this by m and take the floo of the result.
+ 2. Multiply this by m and take the floor of the result.
 Advantage of this method is that m is not crucial. We usually choose m to be some power of 2, as it allows for slicker implementation.
 A = (sqrt(5) - 1)/2 ~ 0.618 works well.
 -=- Universal hashing

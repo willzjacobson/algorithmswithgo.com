@@ -140,14 +140,16 @@ Thus, we can use a search tree both as a dictionary and as a priority queue.
 Binary Search Trees
 Each node is an object containing satellite data, and attribute left, right, and p (parent).
 For any node x, the keys in the left subtree are at most x.key, and the keys in the right subtree are at least x.key.
-Te worst case running time for most search-tree operations is proportional to the height of the tree. 
+The worst case running time for most search-tree operations is proportional to the height of the tree. 
 INORDER-TREE-WALK(x)  // print all nodes in non decreasing order (O(n) time)
 if x != nil 
   INORDER-TREE-WALK(x.left)
   print x.key
   INORDER-TREE-WALK(x.right)
 PREORDER-TREE-WALK(x) // print the root before the values in either tree
-PREORDER-TREE-WALK(x) // print the root after the values in either tree
+  Useful for printing our a heirarchy
+POSTORDER-TREE-WALK(x) // print the root after the values in either tree
+  Useful for executing operations described by a tree (such as cumulative arithmatic)
 TREE-SEARCH-RECURSIVE(x, k) // O(h) where h is the height of the tree, since we traverse a simple path down the tree
   if x == nil or k == x.key
     return x
@@ -183,7 +185,7 @@ TREE-SUCCESSOR(x) {
 TREE-PRECESSOR(x) {
   if x.left != nil
     return TREE-MAXIMUM(x.left)
-  // if node has no left child, it's successor is its lowest ancestor whose right child is also an ancestor.
+  // if node has no left child, it's precessor is its lowest ancestor whose right child is also an ancestor.
   y = x.p
   while y != nil and x == y.left
     x = y
@@ -209,8 +211,8 @@ TREE-INSERT(T,z)
 -=- Deletion
 3 cases:
   1) if z has no children, remove it by modifying parent to replace z with nil as its child.
-  2) if z has one, then we elevate that child to take z's position in the tree by modifying z's parent to replace z with z's child.
-  3) if z has 2 children, we find z's successor y (in z's right subtree) and have y take z's posotion in the tree. The rest of z's right subtree becomes y's new right subtree, and z's left subtree becomes y's new left subtree. This is tricky, as it matters whether y is z's right or left child.
+  2) if z has one child, then we elevate that child to take z's position in the tree by modifying z's parent to replace z with z's child.
+  3) if z has 2 children, we find z's successor y (in z's right subtree) and have y take z's position in the tree. The rest of z's right subtree becomes y's new right subtree, and z's left subtree becomes y's new left subtree. This is tricky, as it matters whether y is z's right or left child.
 ---
 TRANSPLANT(T,u,v)  // helper function used in node deletion. Replaces one subtree (u) as a child of its parent with another subtree (v)
 if u.p == nil  // u is root of T

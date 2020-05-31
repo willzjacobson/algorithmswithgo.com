@@ -232,11 +232,10 @@ else y = TREE-MINIMUM(z.right)  // find successor of the node's right subtree
   if y.p != z  // case where the z's successor is NOT its right child; swap it with z's right child
     TRANSPLANT(T, y, z.right)
     y.right = z.right
-    r.pright.p = y
+    y.pright.p = y
   TRANSPLANT(T,z,y)  // swap z with (what we now know to be) its right child
   y.left = z.left
   y.left.p = y
-TODO: Implement the above operations for a binary search tree.
 
 Red Black Trees
 If the hieght of a binary search tree is large, the operations may run more like O(n) like a linked list. Red-black trees are one of many trees that are "balanced" to guarantee operations take O(logn) time in the worst case.

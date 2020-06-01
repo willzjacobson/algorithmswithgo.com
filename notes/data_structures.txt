@@ -247,5 +247,5 @@ RB tree properties:
  - every leaf (Nil) is black
  - if a node is red, then both its children are black
  - For each node, all simple paths from the node to descendant leaves contain the same number of black nodes.
-These 5 properties must be maintained during insertion and deletion.
+These 5 properties must be maintained during insertion and deletion. As a result of maintaining them a red-black tree with n internal nodes has heightat most 2lg(n+1).
 TODO: Implement a RB tree.

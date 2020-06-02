@@ -1,0 +1,20 @@
+Dynamic programming (DP), like the divide-and-conquer method, solves problems by combining the solutions to subproblems ("programming" here refers to a tabular method here, not writing computer code).
+Divide-and-conquer algorithms break a problem into disjoint subproblems. Dynamic programming applies when the subproblems overlap; that is, when subproblems share subprobems. 
+Sometimes divide-and-conquer problems do more work than necessary by repeatedly solving certain subproblems. A dynamic-programming algorithm solves each subproblem, then stores its result in a table so it does not have to be solved again if encountered again. 
+We typically apply DP to oprimization problems, where there are exist many solutions but we are looking for an optimal solution.
+Four typical steps of DP:
+ 1) Characterize the structure of an optimal solution.
+ 2) Recursively define the value of an optimal solution.
+ 3) Compute the value of an optimal soplution, typically in a bottom-up fashion.
+ 4) Construct an optimal solution from computed information. (if we only need the value of the solution, and not the solution itself, we can skip this step)
+
+When planning out a dynamic-programming algorith, it can be useful to map out the subproblems involved. 2 good ways to do this:
+ - a recursive tree, where each node represents a subproblem of a certain "size"
+ - a subproblem graph, which is like a collapsed version of a tree. It has 1 vertex, along with nodes lie that represent subproblems of decreasing size. Each node has an arrow pointing to the subproblems that must be solved in order to solve it.
+
+A bottom-up method for dynamic-programming considers te vertices of the subproblem graph in such an order that no subproblem is considered until all of the subproblems it depends upon have been solved. We consider the vertices of the subproblem graph in an order that is a "reverse topological sort", or a "topological sort of the transpose." 
+Similarly, we can view a top down method (with memoization) as a "depth-first search."
+
+The time to compute a subproblem is typically proportional to the degree (# of outgoing edges) of the corresponding vertex in the subproblem graph, and the number of subproblems is equal yo the number of vertices in the graph. In this case, the running time of dynamic programming is linear in the number of vertices and edges.
+
+

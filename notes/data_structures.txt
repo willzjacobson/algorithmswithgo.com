@@ -249,3 +249,56 @@ RB tree properties:
  - For each node, all simple paths from the node to descendant leaves contain the same number of black nodes.
 These 5 properties must be maintained during insertion and deletion. As a result of maintaining them a red-black tree with n internal nodes has heightat most 2lg(n+1).
 TODO: Implement a RB tree.
+
+Order-Statistic Tree
+An augmented Red-Black tree, in which each node holds an additional attribute: "size", which represents the size of the subtree of which it is the root.
+Equivalent to left subtree size + right subtree size + 1 for itself.
+  node.size = node.left.size + node.right.size + 1
+Operations: // both O(logn)
+OS-SELECT(x, i)  // returns a pointer to the node containing the i'th smallest key in the subtree rooted at node x
+  r = x.left.size + 1
+  if r == i
+    return x
+  if i < r
+    return OS-SELECT(x.left, i)
+  return OS-SELECT(x.right, i-r) // subtract r from i, since we've already accounted for the lowest r nodes
+OS-RANK(T, x)  // determines the rank of node x as it would fall in an In-Order traversal
+  r = x.left.size + 1
+  y = x
+  for y != T.root
+    if y = y.p.right
+      r += y.p.left.size + 1
+    y = y.p
+  return r
+To benefit from the size property, we have to maintain it during the insertion and deletion operations.
+  During Insertion:
+  - Increment each node we traverse by
+  - During rotations. Only the 2 nodes have their sizes change. Example for LEFT-ROTATE(T,x):
+    y.size = x.size  // y takes x's place, higher up in the tree
+    x.size = x.left.size + x.right.size + 1 // calculated after the rotation is complete
+  During Deletion
+  - deletion involves removing 1 node from the tree, and moving 1 or 2 other nodes within the tree. 
+  - rotations are handled the same was as in they are during insertion.
+
+Interval Trees
+Augmented Red-Black tree that supports operations on dynamic sets of intervals.
+Each node contains the data:
+  int: // the interval the node represents
+    low: integer
+    high: integer
+  max: integer  // the highest high in the subtree rooted by this node (max(x.int.high), x.left.max, h.right.max). This field has to be maintained during insertions/deletions
+new operation: find a node that overlaps with a given interval
+INTERVAL-SEARCH(T,i) // find a node in tree T whose interval overlaps interval i
+  x = T.root
+  while x != T.nil && !(x.int.low <= i.high && i.low <= x.int.high) // continue while x exists and x.int does not overlap with interval i
+    if x.left !== T.nil && x.left.max >= i.low
+      x = x.left
+    else x = x.right
+  return x
+
+General steps for enhancing any data structure:
+ - Choose an underyling data structure.
+ - Determine additional information to maintain in the underlying data structure.
+ - Verify that we can maintain the additional info for basic operations supported by the data structure.
+ - develop new operations (desiring these new operations is really the motivation in the first place).
+

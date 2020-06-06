@@ -17,4 +17,7 @@ Similarly, we can view a top down method (with memoization) as a "depth-first se
 
 The time to compute a subproblem is typically proportional to the degree (# of outgoing edges) of the corresponding vertex in the subproblem graph, and the number of subproblems is equal yo the number of vertices in the graph. In this case, the running time of dynamic programming is linear in the number of vertices and edges.
 
+2 key ingredients that an optimization problem must have in order for dynamic programming to apply:
+ 1) Optimal substructure. A problem exhibits optimal substructure if an optimal solution to the problem contains within it optimal solutions to subproblems (greedy algorithm could also apply).
+ 2) overlapping subproblems
 

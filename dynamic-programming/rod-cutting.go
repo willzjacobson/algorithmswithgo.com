@@ -51,6 +51,7 @@ func CutRodTopDown(p []int, n int) int {
 	return CutRodTopDownAux(p, n, cache)
 }
 
+// CutRodTopDownAux : helper for CutRodTopDown
 func CutRodTopDownAux(p []int, n int, c map[int]int) int {
 	if n == 0 {
 		return 0
@@ -72,16 +73,16 @@ func CutRodTopDownAux(p []int, n int, c map[int]int) int {
 }
 
 // CutRodBottomUp : Top-down with memoization
-// This approach requires some notion of the "size" of a subproblem, sich that solving any particular subproblem depends only on solving "smaller" subproblems.
+// This approach requires some notion of the "size" of a subproblem, such that solving any particular subproblem depends only on solving "smaller" subproblems.
 // This method generally has better constant factors, since it has less overhead for procedure calls
-// O(n) due to nexted loop
+// O(n^2) due to nexted loop
 func CutRodBottomUp(p []int, n int) int {
 	c := []int{0} // cache
 
-	for i := 1; i <= n; i++ {
-		maxResultForRodOfLengthI := 0
-		for j := 1; j <= i; j++ {
-			maxResultFromFollowingThisSubtree := p[j] + c[i-j]
+	for i := 1; i <= n; i++ { // i is the length of the rod in this subproblem
+		maxResultForRodOfLengthI := 0 // tracking the max result for this subproblem (a rod of length i)
+		for j := 1; j <= i; j++ {     // looping from first inch to the length of this rod
+			maxResultFromFollowingThisSubtree := p[j] + c[i-j] // max result if we make a cut at inch j
 			if maxResultFromFollowingThisSubtree > maxResultForRodOfLengthI {
 				maxResultForRodOfLengthI = maxResultFromFollowingThisSubtree
 			}

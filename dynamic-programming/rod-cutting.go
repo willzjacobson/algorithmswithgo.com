@@ -75,7 +75,7 @@ func CutRodTopDownAux(p []int, n int, c map[int]int) int {
 // CutRodBottomUp : Top-down with memoization
 // This approach requires some notion of the "size" of a subproblem, such that solving any particular subproblem depends only on solving "smaller" subproblems.
 // This method generally has better constant factors, since it has less overhead for procedure calls
-// O(n^2) due to nexted loop
+// O(n^2) due to nested loop. There are n subproblems to solve (length from 1-n), and each one takes O(n) time.
 func CutRodBottomUp(p []int, n int) int {
 	c := []int{0} // cache
 

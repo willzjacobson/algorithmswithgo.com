@@ -25,8 +25,9 @@ In the matric chain multiplication problem, we're not actually multiplying matri
 For a set of n matrices to be multiplied, there are 2^n ways to paranthesize them. So, this is a problem worth optimizing :)
 */
 
-// MatrixChainOrder : Bottom-up dynamic programming method for solving the matrix chain order problem
-func MatrixChainOrder(p []int) ([][]int, [][]int) {
+// MatrixChainOrderBottomUp : Bottom-up dynamic programming method for solving the matrix chain order problem
+// There are n^2 subproblems to solve, and each one takes O(n) time. We solve each subproblem once. The full solution is O(n^3).
+func MatrixChainOrderBottomUp(p []int) ([][]int, [][]int) {
 	// length of the matrix chain
 	n := len(p) - 1
 	// build data structures:
@@ -81,11 +82,49 @@ func PrintOptimalPerens(s [][]int, i int, j int) string {
 	return "(" + start + end + ")"
 }
 
+// MemoizedMatrixChain : solve the matrix chain multiplication problem in a top-down recursive approach with momoization.
+// As in the bottom-up approach, we have n^2 subproblems to solve, and each one takes O(n) time. We solve each subproblem once. The full solution is O(n^3).
+// Without the momoization, the run time would be O(2^(n-1)), since we would solve many of the subproblems multiple times.
+func MemoizedMatrixChain(p []int) int {
+	// build up helper table
+	n := len(p) - 1
+	m := make([][]int, n)
+	for i := 0; i < n; i++ {
+		m[i] = make([]int, n)
+		for j := range m[i] {
+			m[i][j] = -1
+		}
+	}
+
+	return LookupChain(p, 0, n-1, m)
+}
+
+// LookupChain : helper method for MatrixChainOrderTopDown
+func LookupChain(p []int, i, j int, m [][]int) int {
+	if m[i][j] != -1 {
+		return m[i][j]
+	} else if i == j {
+		return 0
+	} else {
+		for k := i; k < j; k++ {
+			q := LookupChain(p, i, k, m) + LookupChain(p, k+1, j, m) + p[i]*p[k+1]*p[j+1]
+			if m[i][j] == -1 || q < m[i][j] {
+				m[i][j] = q
+			}
+		}
+		return m[i][j]
+	}
+}
+
 func main() {
 	p := []int{30, 35, 15, 5, 10, 20, 25}
-	m, s := MatrixChainOrder(p)
+	m, s := MatrixChainOrderBottomUp(p)
 	fmt.Println("m:", m)
 	fmt.Println("s:", s)
 	perens := PrintOptimalPerens(s, 0, len(p)-2)
 	fmt.Println("perens:", perens)
+
+	// Memoized top down approach
+	n := MemoizedMatrixChain(p)
+	fmt.Println("Using top down memoized approach:", n)
 }

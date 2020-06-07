@@ -15,9 +15,9 @@ When planning out a dynamic-programming algorith, it can be useful to map out th
 A bottom-up method for dynamic-programming considers te vertices of the subproblem graph in such an order that no subproblem is considered until all of the subproblems it depends upon have been solved. We consider the vertices of the subproblem graph in an order that is a "reverse topological sort", or a "topological sort of the transpose." 
 Similarly, we can view a top down method (with memoization) as a "depth-first search."
 
-The time to compute a subproblem is typically proportional to the degree (# of outgoing edges) of the corresponding vertex in the subproblem graph, and the number of subproblems is equal yo the number of vertices in the graph. In this case, the running time of dynamic programming is linear in the number of vertices and edges.
+The time to compute a subproblem is typically proportional to the degree (# of outgoing edges) of the corresponding vertex in the subproblem graph, and the number of subproblems is equal to the number of vertices in the graph. In this case, the running time of dynamic programming is linear in the number of vertices and edges.
 
 2 key ingredients that an optimization problem must have in order for dynamic programming to apply:
- 1) Optimal substructure. A problem exhibits optimal substructure if an optimal solution to the problem contains within it optimal solutions to subproblems (greedy algorithm could also apply).
- 2) overlapping subproblems
+ 1) Optimal substructure. A problem exhibits optimal substructure if an optimal solution to the problem contains within it optimal solutions to subproblems (greedy algorithm could also apply). These subproblems must be independent; that is, the solution of 1 does not affect the solution of another.
+ 2) overlapping subproblems. We can use a divide-and-conquer strategy when the subproblems do not overlap
 

@@ -34,9 +34,9 @@ func maxSubArray(nums []int) int {
 	maxSoFar := nums[0]
 	maxToHere := nums[0]
 
-	for i := 1; i < len(nums); i++ {
-		maxToHere += nums[i]
-		maxToHere = int(math.Max(float64(maxToHere), float64(nums[i])))
+	for _, v := range nums {
+		maxToHere += v
+		maxToHere = int(math.Max(float64(maxToHere), float64(v)))
 
 		maxSoFar = int(math.Max(float64(maxToHere), float64(maxSoFar)))
 	}

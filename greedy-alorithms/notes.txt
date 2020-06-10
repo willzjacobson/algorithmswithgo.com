@@ -1,0 +1,1 @@
+Dynamic programming approaches are often overkill. A greedy algorithm always makes teh choice that looks best in the moment (the locally optimal choice).

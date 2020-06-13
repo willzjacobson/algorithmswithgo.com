@@ -1,1 +1,13 @@
-Dynamic programming approaches are often overkill. A greedy algorithm always makes teh choice that looks best in the moment (the locally optimal choice).
+Dynamic programming approaches are often overkill. A greedy algorithm always makes teh choice that looks best in the moment (the locally optimal choice). If there is a greedy solution, there is almost always a more cumbersome dynamic-programming solution as well. 
+
+We design greedy algorithms accoring to these steps:
+1) Cast the optimization problem as one in which we make a choice and are left with one subproblem to solve.
+2) Prove that there is always an optimal solution to the original problem that makes the greedy choice, so the greedy choice is always safe.
+3) Demonstrate optimal substructure by showing that, having made the greedy choice, what remains is a subproblem with the property that if we combine an optimal solution to the subproblem with the greedy choice we have made, we arrive an an optimal solution to the original problem.
+
+"The greedy choice property": We can assemble a globally optimal solution by making locally optimal (greedy) choices, without needing to consider subproblems. In dynamic-programming, on the other hand, the choice we make at each step generally depends on the answers to subproblems. A greedy algorithm makes its first choice before solving any subproblems. Due to this difference, DP algos generally proceed bottom-up, while greedy algos generally proceed top-down. 
+
+"Optimal Substructure": A problem exhibits optimal substructure if an optimal solution to the problem contains within it optimal solutions to subproblems (this is the case both for greedy and DP). For greedy solutions, all we really need to do is ague that an optimal solution to the subproblem, combined with the greedy choice already made, yields an optimal solution to the original problem. 
+
+Greedy versus dynamic programming
+Consider the 0-1 knapsack problem, and the fractional knapsack problem (where you're allowed to take fractional amounts of each item). The fractional problem can be solved using a greedy solution, because you can just keep filling the knapsack with the item that has the greatest value per weight, and so you don't need to solve independent subproblems. However, for the 0-1 problem, you need to solve the subproblem in which you include item x, and the one in which you exlcude it. Thus, you reach for DP.

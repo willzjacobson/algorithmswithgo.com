@@ -41,8 +41,10 @@ func GreedyTaskScheduler(tasks []Task) ([]Task, int, int) {
 		}
 
 		fitsInOptimalSet := false
-		for _, o := range optimalIndependentSetOfTasks {
-			if o.dealine >= timeSlotsAvailableIfTaskIsChosen {
+		for i, o := range optimalIndependentSetOfTasks {
+			// check that a task already in the optimal set can be moved later,
+			// and that the task we're trying to add can take its place without being late
+			if o.dealine >= timeSlotsAvailableIfTaskIsChosen && t.dealine >= i+1 {
 				fitsInOptimalSet = true
 				break
 			}

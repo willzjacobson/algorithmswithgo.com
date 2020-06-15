@@ -1,0 +1,40 @@
+B-Trees
+Similar balanced search trees designed to work well on dists or other direct-access secondary storage devices. They are similar to red-black trees, but better at minimizing disk I/O operations. Many database systems use B-trees (or variants thereof) to store information.
+B-trees differ from red-blakc trees in that each node may have as many as thousands of children (that is, the branching factor can be large). 
+B-trees are similar to red-black trees in that each node has height O(lgn). However, since the height can be much less, the base of the log that expresses its height can be much larger.
+If an internal B-tree node x contains x.n keys, then it has x.n+1 children. They keys in x serve as dividing points eparating the rangs of keys handled by x into x.n+1 subranges. Each subrange is handled by a child of x. 
+Disk operations are much slower than main memory operations. If we have a B-tree stored on disk, a large branching factor reduces the height of the tree, and thus reduces the number of disk operations that must be performed to find and operate on a node in a B-tree. Thus, a B-tree node is usually the size of a wole disk page (the amount of data that can be read/written in a single disk action), and is limited by the page size.
+Lets say we have a B-tree stored in memory that has a branching factor of 1000. If we keep the root node stored in main memory (RAM; much faster look-up than disk), we can find any of the 1 billion nodes with at most 2 disk look-ups. 
+A B+-tree is a common variant of a B-tree that stores all the satelite info in the leaves and stores only keys and child pointers in the internal nodes, thus maximizing the branching factor of the internal nodes.
+
+B-tree definition
+A B-tree is a rooted tree (whose root is T.root) having the following properties:
+1) Every node x has teh following attributes:
+  a) x.n, the number of keys currency stored in node x
+  b) the x.n keys are stored in non-decreasing order
+  c) x.leaf, a boolean value that is TRUE if x is a leaf and FALSE if x is an internal node
+2) Each internal node x also contains x.n+1 pointers to its children x.c1, x.c2,...,x.cx.n+1. Leaf nodes have no children, so their ci attributes are undefined.
+3) The keys x.keyi separate the ranges of keys stored in each subtree: if ki is any key stored in the subtree with root x.ci, then:
+  k1 <= x.key1 <= k2 <= x.key2 <= ... <= x.keyx.n <= kx.n+1.
+4) All leaves have the same depth, which is the tree's height h.
+5) Nodes have lower and upper bounds on the number of keys they can contain. We express these bounds in terms of a fixed integer t>=2 called the "minimum degree" of the B-tree:
+  a) Every node other than the root must have >= t-1 keys. Every internal node other than the root thus has >=t children. If the tree is nonempty, the root must have >=1 key.
+  b) Every node may contain at most 2t-1 keys. Therefore, an internal node may have at most 2t children. We say a node is "full" if it contains exactly 2t-1 keys. note: another viant called a B*-tree requires all nodes to be >= 2/3 full. 
+
+The simplest B-tree occurs when t=2. Every internal node then has either 2,3, or 4 children (this is called a 2-3-4 tree). Generally t is much larger to reduce h, since the number of disk accesses for most operations on a B-tree is porprtional to h.
+If n>=1, then for any n-key B-tree of height h and minimum degree t>=2:
+  h <= logt((n+1)/2)  (that's log with base t)
+
+Basic B-tree Operations
+In our implementation of these methods, we assume the relevant satelite data (the reason the BTree exists is to hold this) travels around with the key (thus, a node holds multiple pieces of salelite data).
+B-TREE-SEARCH(T.root,k)  // takes the root of a subtree, and a key to search for
+ - Much like searching in a binary tree, except at each internal node x, we make an (x.n+1)-way branching decision.
+ - Returns the node y and the index i such that y.keyi = k, or nil if no node is found to contain the key k.
+B-TREE-CREATE()
+B-TREE-INSERT
+Inserting is more complex than inserting a key into a binary search tree, because rather than just creating a new node, we must insert the new key into an existing leaf node. We must also have a procedure for splitting full nodes that we encounter, since we can't insert new keys into full nodes. We split a node around its median k, x.keyt. 
+The only way a tree grows is by node splitting. 
+The only way to increase a B-tree's height is by splitting the root (this is different from a binary search tree, where height increases by adding new nodes at the bottom).
+
+The above operations are all "one-pass" operations that proceed downward from the root of the tree, without having to back up.
+We assume we always keep the root in main memory, so it does not require a disk read to access. However, it does require a disk write to update.

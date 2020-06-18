@@ -38,3 +38,86 @@ The only way to increase a B-tree's height is by splitting the root (this is dif
 
 The above operations are all "one-pass" operations that proceed downward from the root of the tree, without having to back up.
 We assume we always keep the root in main memory, so it does not require a disk read to access. However, it does require a disk write to update.
+
+B-TREE-DELETE(T.root,k) // deletes the key k from the subtree rooted at x. Runs in time O(t logtn).
+Deletion is analagous to insertion, but more complex because we can delete a key from an internal node or a leaf, whereas we only add to a leaf. When we delete from an internal node, we have to rearrange the children.
+Just as we ensure we don't let a node get too big during insertion, we have to ensure it doesn't get too small during deletion (only the root can have fewer than t-1 keys). Just as the insertion algorithm may have to back up if a node on the path to where the key was to be inserted was full, a deletion algorithm may have to back up if a node (other than the root) along the path to where the key is to be deleted has the minimum number of keys.
+We design the deletion procedure such that before it calls itself recursively on a node, we ensure that node has at least t (1 greater than the minimum) keys, so that one could theoretically be deleted.
+See p. 500 for the rules.
+
+-=-=-
+Fibonacci-heap
+2 purposes:
+  1) supports a set of operations that constitutes what is known as a "mergable heap"
+  2) several operations of a Fibonacci-heap run in constant amortized time, which makes the data structure well-suited for applications that invoke these operations frequently.
+
+A mergable Heap is a data structure that supports the following 5 operations, in which each element has a key:
+  MAKE-HEAP()  // creates and returns a new heap contining no empty elements
+  INSERT(J, x)  // inserts element k, whose key has already been fulled in, into heap H
+  MINIMUM(H)  // returns a pointer to the element in heap H whose key is minimum
+  EXTRACT-MIN(H)  // deletes the element from heap H whose key is minimum, returning a pointer to the element
+  UNION(H1, H2)  // creates and returns a new heap that contains all the elements of heaps H1 and H2 (H1 and H2 are destroyed).
+Note: Default mergable heaps are min-heaps. We could also have mergable max-heap with operations MAXIMUM, EXTRACT-MAX, and INCREASE-KEY.
+Fibonacci-heaps also support these 2 operations:
+  DECREASE-KEY(H,x,k)  // assigns to element x within heap H the new key value k, which we assume to be no greater than its current key value.
+  DELETE(H,k)  // delete element x from heap H
+
+Running times for operations on 2 implementations of mergable heaps:
+procedure           Binary Heap (worst case)        Fibonacci-heap (ammortized)
+MAKE-HEAP             O(1)                            O(1)
+INSERT                O(lg n)                         O(1)
+MINIMUM               O(1)                            O(1)
+EXTRACT-MIN           O(lg n)                         O(lg n)
+UNION                 O(n)                            O(1)
+DECREASE-KEY          O(lg n)                         O(1)
+DELETE                O(lg n)                         O(lg n)
+
+If we don't need the union procedure, ordinary binary heaps (as used in Heap Sort) work fairly well.
+With binary heaps, the UNION operation works by concatinating the 2 arrays that represent the heaps, then running BUILD-MIN-HEAP. This takes O(n) worst case.
+Neither binary nor Fib heaps perform SEARCH operations well; it's not really their purpose.
+
+Fibonacci-heaps are especially desirable when the number of EXTRACT-MIN and DELETE calls are small relative to the number of other operations performed. This is particularly common in graph algorithms. 
+However, Fibonacci-heaps are complex and contain a large number of constants. Thus, they're mainly used for theoretical purposes, or for applications that use large amounts of data.
+
+A Fibonacci-heap is a collection of rooted trees. Each element is a node within a tree, and each node has a key. Each tree is "min-heap ordered". That is, each tree obeys the min-heap property: the key of a node is greater than or equal to the key of its parent.
+Each node contains a pointer x.p to its parent and a single pointer x.child to any ONE of its children. 
+The children of x are linked together in a circular, doubly linked list (the "child list" of x). 
+Each child y in a child list has pointers y.left and y.right that point to its siblings. Sibling order is not important. 
+Circular, doubly linked lists are handy because:
+  - we can insert/remove a node into/from any lcation in the list.
+  - we can concatenate 2 lists into 1 in O(1) time.
+Each node has 2 more qualities:
+  - We store the number of children in the child list of a node x as x.degree.
+  - x.mark is a boolean that records whether x has lost a child since the last time x was made the child of another node. (Ff a marked node has a child removed, the node is moved to the root list and unmarked. This happens in DECRESE-KEY)
+We access a Fib heap H by a pointer to the root of a tree containing the minimum key (we call this the "minimum node"). If the same key occurs in the root of another tree, either can serve as the minimum node. When H is empty, H.min is nil.
+The roots of the trees are linked together via left/right in a circular doubly linked list called the "root list" of the heap. Trees may appear in any order.
+H.n tracks the number of nodes currently in H.
+
+Potential Function (used to perform ammortized analysis of runtime complexity)
+P(H) = t(H) + 2m(H)  // t(H) is the number of trees in the root list of H, and m(H) is the number of "marked" nodes in H.
+
+Operations:
+INSERT  Adds a new node to the root list, which is constant time. If the new node is < H.min, we update H.min to point to the new node. All roots remain roots.
+We avoid consolidating nodes in the root list into trees until we really have to (rather than doing it upon insertion). Otherwise, INSERT could not run in O(1) time.
+MINIMUM  Simple: H.min points to it.
+UNION  We simply concatenate the root lists of H1 and H2, and determine the new H.min. All roots remain roots.
+EXTRACT-MIN  is the more complex, and it is also where the delayed work of consolidating trees in the root list finally occurs. 
+Moves each child z of H.min to the root list and set z.p to nil, then removes H.min from the root list. If z is its own right child, set H.min to nil. Else, set H.min to z.right, which may not actually be the new min. Then calls CONSOLIDATE(H) helper function, which consolidates the root list bu repeatedly performing the following steps until every root in the root list has a distinct degree:
+ 1) Find 2 roots x and y in the root list with the same degree. Without loss of generality, let x.key <= y.key.
+ 2) Link y to x: trmove y from the root list, and make y a child of x using a helper FIN-HEAP-LINK, which increments the attribute x.degree and clears the mark on y.
+A helper array A is used from [1,2,...,D(n)], which is a temp holder for root nodes of the root list as they are consolidated. The nodes are then taken from A and put back in H. There will be fewer than at the start.
+Note that the maximum degree D(n) is O(lgn).
+DECREASE-KEY
+Decrease the value of node x. Call x.p y. If x.key < y.key, break its tie with y and move x up to the root list. If x is marked, unmark it. 
+If y was not marked, mark it. If y was already marked, move it to the root list and unmark it. Do the same conditional operation on y.p until either the node's parent is nil or unmarked. The purpose of the mark (I believe) is just to help us find an upper bound when performing ammortized analysis.
+If x is now < H.min, make it the new min.
+DELETE  simply calls DECREASE-KEY on the node to delete to negative infinity, then calls EXTRACT-MIN :)
+
+-=-=-
+van Emde Boas Trees
+We've seen several data structures that support the operations of a priority queue: binary heaps, red-black trees, and Fibonacci heaps. In the case of each structure, there is at least one operation that takes O(lg n) time, either worst case or amortized. Each of these structures bases its decision on comparing keys. The lower bound on search of O(nlgn) tells us the lower bound by definition: since you could sort by inserting each the keys into the structure, then extracting the min, you can only perform sorting in O(nlgn) if both the INSERT and EXTRACT-MIN operation take O(lg n) time (since you have to do them each n times to sort a list of length n).
+But as we've seen (with counting sort, for example), you can exploit additional information to sort faster.
+Analagously, van Embde Boas Trees support the priority queue operations, and a few others, each in O(lg lg n) worst case time using additional knowledge about the set of keys. The hitch is that the keys must be integers in the range  0 - n-1, with no duplicates.
+In discussion below, we use n to denote the number of elements in the set, and u as the range of possible values (so each operation runs in O(lg lg u) time) where the highest value in the set is u-1. We assume for the sake of ease that u is an exact power of 2.
+Operations: SEARCH, INSERT, DELETE, MINIMUM, MAXIMUM, SUCCESSOR, PREDECESSOR. 
+

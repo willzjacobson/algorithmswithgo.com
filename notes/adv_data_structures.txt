@@ -121,3 +121,28 @@ Analagously, van Embde Boas Trees support the priority queue operations, and a f
 In discussion below, we use n to denote the number of elements in the set, and u as the range of possible values (so each operation runs in O(lg lg u) time) where the highest value in the set is u-1. We assume for the sake of ease that u is an exact power of 2.
 Operations: SEARCH, INSERT, DELETE, MINIMUM, MAXIMUM, SUCCESSOR, PREDECESSOR. 
 
+A vEB Tree is a recursive structure that stores integers using direct addressing. It has several properties:
+ - u: The size of the universe of the data contained within the tree (if the tree can hold the values 0-3, then u=4).
+ - min: the mininum integer value held in the tree. The element stored in V.min does not appear in any of the recursive trees that the cluster array points to.
+ - max: the maximum integer value held in the tree. Unlike min, if V.u > 2, V.max does appear in a recursive subtree, unless V.max=V.min.
+ - cluster: an array of length sqrt(u) that holds pointers to sqrt(u) other vEB trees, each having u=sqrt(u).
+    If u=2, there's no need for this "cluster" array, since the values can be represented by "min" and "max".
+ - summary: a pointer to another vEB tree of u=sqrt(u). This tree, rather than holding data about numbers in the set, holds data about whether each of the tree's clusters hold any data.
+    Example: 
+      If a tree V has V.u=16, it's V.summary points to a tree with u=4. 
+      The summary tree has 2 sub-clusters, each of u=2. The first tells whether the 1st and 2nd clusters pointed to by V.clusters hold >=1 element. It does this via its min and max properties: if the 1st and 2nd clusters in V.clusters each hold >=1 element, min=0 and max=1. If only the first does, min=max=0. The second tells whether the 3rd and 4th clusters pointed to by V.clusters hold >=1 element, in the same way.
+      The summary tree also has a summary prop, which points to another tree of u=2. This tree records whether the 2 cluster trees pointed to by the top level summary tree each hold >= 1 element, in the same way described above.
+
+Why do the operations have a runtime of O(lg lg u), where u descrives the range of values that the tree can contain (the tree contains values of 0 - u-1)?
+In a red-black tree, the height is ~lg n, which means search time is O(lg n) since at most you have to traverse through lg n nodes.
+In vEB tree, the base tree has u=2, and u grows by a factor of u^2 with each level. For any value of u, we see that lg lg u = 2. Example: lg lg 16 = 2, since (2^2)^2 = 16. Thus, any operation requiring traversal has a runtime of O(lg lg u).
+To make implementation easier, let's say u=2^(2^2k) for any integer k. While this limits our set of possible values for u to 2,3,16,256,65536, it ensures u is an integer. In practice, if we're willing to make use of some techniques that allow u to be a non integer, we can have u=2^k for any integer k.
+
+Indexing
+We need a way to index the elements of V in a way that's independent of U. 
+To find the cluster number of V that an element x would be in, we use the 'high' function:
+  high(x) = x / sqrt(u)
+To find x's position within its cluster, we use the 'low' function:
+  low(x) = x % sqrt(u)
+To build an element number from x and y, we use the 'index' function:
+  index(x,y) = x*sqrt(u) + y

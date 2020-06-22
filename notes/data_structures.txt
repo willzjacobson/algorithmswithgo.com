@@ -128,10 +128,28 @@ Given an open-address hash table with load factor a = n/m < 1, the expected numb
 Inserting an element into an open-address hash table with load factor a requires at most 1/(1-a) probes on average.
 Given an open-address hash table with load factor a<1, the expected number of probes in a a successful search is at most (1/a)*ln(1/(1-a)). Half full: 1.287 probes. If 90% full, 2.559 searches.
 -=-=- Perfect Hashing
-We cll a hashing technique "perfect hashing" if O(1) memory accesses are requierd to perform a search in the work case. This can be done if the set of keys is status (once the keys are stored in the table, they don't change).
+We call a hashing technique "perfect hashing" if O(1) memory accesses are requierd to perform a search in the work case. This can be done if the set of keys is status (once the keys are stored in the table, they don't change).
 To reate a perfect hashing scheme, we use 2 levels of hashing, with universal hashing at each level: 
   1) The first level is the same as for hashing with chaining: hash the n keys into m slots using hash function h carefully chosen from a family of universal hash functions. 
   2) Intead of making a linked list of the keys hashing to slot j, we use a small secondary hash table with an associated hash function. By choosing the hash functions carefully, we can guarantee there are no collisions in the secondary level. In order to ensure no collisions, the size of the inner hash table must be the square of the number of keys hashing to slot j. This seems like it would require a lot of memory, but it turns out to be only O(n) for the primary hash table and each secondary hash table.
+
+Hash Sets
+Holds a set of objects by internally managing an array and storing the object using an index that is calculated from the hashcode of the object.
+Hash sets are unordered. 
+Supports the operations ADD, REMOVE, CONTAINS in O(1) time, since rather than searching, we are hashing the object.
+A hash set does not allow duplicate values to be stored.
+Also supports the operations UNION, INTERSECTION, SYMMETRIC_DIFFERENCE.
+
+Hash Maps
+Stores key-value pairs. 
+Duplicate keys are not allowed, but duplicate values are. When you try to add a duplicate key, the previous value is replaced.
+Unlike hash sets and hash tables, hash maps maintain the insertion order of the key-value pairs (only within a certain bucket, i think).
+Allows 1 null key, and any number of null values (hash tables don't allow null keys or values).
+You can think of a hash map node as having the following properties:
+ - hash (int)
+ - key
+ - value
+ - next (pointer to next node in the bucket, should one exist)
 
 SEARCH TREES
 Supports many dynamic set properties, including SEARCH, MINIMUM, MAXIMUM, PREDECESSOR, SUCCESSOR, INSERT, and DELETE. Generally, these opertations can be performed in best case O(logn) and worst case O(n)

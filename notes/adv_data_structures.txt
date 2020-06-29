@@ -154,7 +154,7 @@ Some applications involve grouping n distinct elements into a collection of disj
   1) finding the unique set that contains a given element
   2) uniting 2 sets
 This section explores methods for maintinaing a data structure that supports these operations.
-A disjoint-set data structure maintains a collection S={S1, S2, ..., Sk} of disjoint dynamic sets. We identify each set by a representative, which is some member of the set. Sometimes it doesn't matter which member is used, as long as it doesn't change as long as the set is unchanged. Sometimes it needs to be a specific member, such as the minimum (assumng the set elements can be ordered).
+A disjoint-set data structure maintains a collection S={S1, S2, ..., Sk} of disjoint dynamic sets. We identify each set by a representative, which is some member of the set. Sometimes it doesn't matter which member is used, as long as it doesn't change unlss the set changes. Sometimes it needs to be a specific member, such as the minimum (assuming the set elements can be ordered).
 
 
 Disjoint set operations (letting x denote a Set object):
@@ -166,7 +166,7 @@ One application of such a data structure would be determining whether nodes are 
 In this discussion, we analyze the running times of disjoint data-structures in terms of 2 parameters:
  - n: the number of MAKE-SET operations
  - m: the number of MAKE-SET, UNION, and FIND-SET operations.
-Each union operations reduces the number of sets by 1. The number of union operations is capped at n-1, since after n-1 unions, only 1 set remains.
+Each union operation reduces the number of sets by 1. The number of union operations is capped at n-1, since after n-1 unions, only 1 set remains.
 Since MAKE-SET operations are included in the total number of operations m, we have m >= n.
 We assume that the n MAKE-SET operations are the first n operations performed.
 
@@ -181,7 +181,7 @@ FIND-SET(x) simply follows the pointer from x back to the set object.
 UNION(x,y) takes more time. It appends y's list to the end of x's list and deletes y's list object. The representative of x's list becomes the rep for the new list. We must update the pointer on each member of Sy to point to the new set. 
 Runtime of UNION:
   Since we need to update the pointers, a series of m MAKE-SET operations followed by a series of m-1 UNION operations actually takes O(n^2) time.
-  However, if we were to track the length of each linked list (easy  to do) and ensure the shorter list is always appended to the longer, the runtime of the above operation is O(n lg n).
+  However, if we were to track the length of each linked list (easy to do) and ensure the shorter list is always appended to the longer, the runtime of the above operation is O(n lg n).
 
 -=- Disjoint Set Forests
 A faster way is to represent sets as rooted trees, with each node representing one member and each tree representing one set. Each member (node) points only to its parent. The root node points to itself.

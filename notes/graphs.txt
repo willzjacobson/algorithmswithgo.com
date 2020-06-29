@@ -81,7 +81,7 @@ Topological sorting is a linear ordering of vertices such that for every directe
 Topological sorting of a graph is not possible if the graph is not a dag.
 
 -=- Strongly Connected Components
-A classic application of DFS is decomposing a directed graph into its strongly connected components (SCCs). It is a common first step in many graph algos, and we can do it using 2 depth-first searches. .
+A classic application of DFS is decomposing a directed graph into its strongly connected components (SCCs). It is a common first step in many graph algos, and we can do it using 2 depth-first searches.
 A strongly connected component of a graph is a maximal set of vertices such that every pair of vertices are reachable from each other.
 Our algo for finding the SCCs of a graph G uses the transpose of G, which we define as GT=(V, ET), where ET consists of the edges of G with their directions reversed. The time to compute GT from the adjacency-list representation of G is O(V+E).
 Note that G and GT have the same SCCs: vertices u and v are reachable from each other in G if and only if they are reachable from each other in GT. 
@@ -91,12 +91,47 @@ STRONGLY-CONNECTED-COMPONENTS(G)
   2. compute GT
   3. call DFS(GT), but in the main loop of DFS, consider the vertices in order of decreasing u.f as computed in line 1 (that is, in topologically sorted order)
   4. output the vertices of each tree in the depth-first forest formed in step 3 as a separate SCC
-The key property is that the component graph is a dag (if it was not, then we would not have distinct SCCs).
+The key property is that the component graph is a dag (if it was not acyclic, then we would not have distinct SCCs).
 
+Why it works:
 - Theorem: Let C and C' be distinct SSCs in a directed graph G=(V,E). Suppose there is an edge (u,v) in E, where u is in C and v is in C'. Then, f(C) > f(C'). That is, the max finishing time in the tree C is greater than that of C'. This is true regardless of whether any vertex in C is dicsovered by DFS before any vertex in C', or vice versa.
 - Corrollary: The above theorem tells us that each edge in GT that goes between distinct SSCs, goes from a component with an earlier finishing time in the DFS to a component with later finishing time. That is, if there in an edge (u,v) in ET, where u in C and v in C', then f(C) < F(C').
 - The above corrollary tells us why the SCC algo works: 
-  - When we perform the 2nd DFS (on GT) in step 3, we start with the SCC whose finishing time is the maximum in the set of SCCs. The search starts from some vertex in C, and visits all other vertices in C. The above corrollary tells us that if C contains no vertices that point to other SCCs. Thus, the resulting depth-first tree rooted at x contains the vertices in C and no others. 
-  - The next white node y that the DFS in step 3 then finds is a member of the SCC C' with the second greatest finish time. Vertices in C' only contain edges pointing to other vertices in C', and to C (but all vertices in C are no longer white). Thus, the resulting depth-first tree rooted at y contains the vertices in C' and no others. And so on for each SCC. 
-  - Therefore, the SSC algo computes the SCCs in G.
+  - When we perform the 2nd DFS (on GT) in step 3, we start with some vertex in the SCC whose finishing time in the 1st DFS is greater than all the other SCCs. The search starts from some vertex in C, and visits all other vertices in C. The above corrollary tells us that if C contains no vertices that point to other SCCs. Thus, the resulting depth-first tree rooted at x contains the vertices in C and no others. 
+  - The next white node y that the DFS in step 3 finds is a member of the SCC C' with the second greatest finish time of the SCCs. Vertices in C' only contain edges pointing to other vertices in C', and to C (but all vertices in C are no longer white). Thus, the resulting depth-first tree rooted at y contains the vertices in C' and no others. And so on for each SCC. 
+  - Therefore, each highest level VISIT call in the 2nd DFS generates a depth-first tree representing an SCC.
 
+
+-=-=- Minimum Spanning Trees
+Example of the problem: We have n electric pins in a circuit that we want to connect. We can use an arrangement of n-1 wires, each connecting 2 pins. We want to find the configuration that uses the least amount if wire possible. For each edge (u,v) we have a weight, which is the cost of wire to connect pins u and v. We call the result a minimum spanning tree (it is a tree, since it's acyclic and connects all the vertices). 
+We can solve the minimum spanning tree problem using Krushal's algo and Prim's algo (both greedy algorithms). Each are O(E lg V) using a binary heap. By using Fibonacci heaps, we can make Prim's algo run in O(E + V lg V), which improves performance if V is much smaller than E.
+
+Useful definitions:
+ - A "cut" (S, V - S) of an undirected graph G=(V,E) is a partition of V. 
+ - We say an edge (u,v) "crosses" the cut if one of its endpoints is in S and the other is in V-S. 
+ - We say that a cut "respects" a set A of edges if no edge in A crosses the cut. 
+ - An edge is a "light edge" crossing a cut if its weight is the minimum of any edge crossing the cut. There can be >1 light edges in the case of ties.
+
+  Theorem: Let:
+  - G = (V, E) be a connected, undirected graph with a real valued weight function w defined on E,
+  - A be a subset of E that is included in some miminim spanning tree for G, 
+  - (S,V-S) be any cut of G that respects A, and
+  - (u,v) be a light edge crossing (S,V-S).
+Then edge (u,v) is safe for A. That is, if (u,v) is added to A, A will still be a subset of E that is included in a mimimum spanning tree for G.
+  Corrollary: Let:
+  - G = (V, E) be a connected, undirected graph with a real valued weight function w defined on E,
+  - A be a subset of E that is included in some miminim spanning tree for G, 
+  - C = (Vc, Ec) be a connected component (tree) in the forest Ga = (V, A).
+If (u,v) is a light edge connecting C to some other component in Ga, then (u,v) is safe for A.
+Proof: the cut (Vc, V-Vc) respects A, and (u,v) is a light edge for this cut. Therefore, (u,v) is safe for A.
+
+-=- Kruskal's Algorithm
+Finds a safe edge to add to the growing forest by finding, of all the dges that connect any 2 trees in the forest, an edge (u,v) of least weight. See programmed example.
+Runtime: O(E lg V)  (the logic used to figure this out is kinda complex, see p.633)
+
+-=- Prim's Algorithm
+Has the property that the edges in the set A always form a single tree, which starts with an arbitrary root r, and grows until the tree spans all the vertices V. Each step adds to the tree A a light edge that connects A to an isoltaed vertex.
+Runtime: O(E lg V) if using a binary heap, O(E + lg v) if using Fibonacci Heap (analysis on p. 636).
+
+
+-=-=- Single-Source Shortest Paths

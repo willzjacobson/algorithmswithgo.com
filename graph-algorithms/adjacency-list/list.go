@@ -4,7 +4,7 @@ package adjacencylist
 type AdjListVertex struct {
 	Value string
 	Color string         // used by the BFS algorithm
-	D     int            // value is assigned by the BFS algorithm
+	D     float64        // value is assigned by the BFS algorithm (and also in the distance algos)
 	P     *AdjListVertex // used in the BFS algorithm to create a breadth-first tree
 	Start int            // used as timestamp by DFS algorithm
 	End   int            // used as timestamp by DFS algorithm

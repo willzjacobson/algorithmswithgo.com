@@ -134,4 +134,62 @@ Has the property that the edges in the set A always form a single tree, which st
 Runtime: O(E lg V) if using a binary heap, O(E + lg v) if using Fibonacci Heap (analysis on p. 636).
 
 
--=-=- Single-Source Shortest Paths
+-=-=- Single-Source Shortest Paths (SSSP)
+In a "shortest-paths" problem, we are given a weighted, directed graph G=(V,E), with weight function w : E -> R mapping edges to real-valued weights. The weight w(p) of path p = <v0,v1,...vk> is the sum of the weights of its constituent edges.
+We denote the shortest path weight from vertex u to v with the symbol 𝛿(u,v). If there is no path from u to v, we say 𝛿(u,v)=∞. 
+A shortest path from vertex u to vertex v is then defined as any path p with weight w(p) = 𝛿(u,v).
+One great application is to model a roadmap, and determine the shortest distance between 2 intersections. However, the weights can also be used to represent other metrics than distance, such as time, cost, penalties, loss, or any other quantity that accumulates linearly along a path that we want to minimize.
+
+Variants:
+ - SSSP problem: Find a shortest path to a given destination vertex t from each vertex v.
+ - Single-pair shortest-path problem: find a shortest path from u to v for given vertices u and v. If we solve the single-source problem, we solve this one (and the 2 have the same runtime).
+ - All-pairs shortest-paths problem: Find a shortest path from u to v for every pair of vertices u and v.
+
+Substructure
+Shortest-paths algos typically rely on the property that a shortest path between 2 vertices contains other shortest paths within it.
+ - Lemma: Given a weighted, directed graph G=(V,E) with weight function w: E -> R, let p=<v0, v1,...,vk> be a shortest path from vertex v0 to vk, and for any i and j such that 0<=i<=j<=k, let pij=<pi,pi+1,...,pj> be the subpath of p from vertex vi to vertex vj. Then, pij is a shortest path from vi to vj.
+
+Negative weights
+Some instances of SSSP problems may include edges with negative weights. So long as no negative weight cycles are reachable from source s, the shortest-path weight 𝛿(s,v) is well defined.
+
+Cycles
+We will have no negative weight cycles, positive weight cycles, or 0-weight cycles in our shortest paths (they are simple paths). Thus, any shortest path will traverse at most V distinct vertices, and V-1 edges.
+
+Representation
+We represent shortest paths similarly to how we did in BFS: with each vertex holding a pointer to the previous vertex along the path. 
+PRINT-PATH(G,s,v) then prints out the path from source vertex s to vertex v. 
+Like with BFS, we'll be concerned with the "predecessor subgraph" Gπ=(Vπ, Eπ), where Vπ is the set of vertices of G with non-nil predecessors, plus the source s.
+The directed edge set Eπ is the set of edges induced by the π values for vertices in Vπ.
+We will later prove that at termination, Gπ is a "shortest-paths tree": a rooted tree containing a shortest path from the source s to every vertex reachable from s.
+Specifically, let G=(V,E) be a weighted, directed graph with no negative weight cycles reachable from the source s. A shortest-paths tree rooted at s is a directed subgraph G'=(V'E'), where V' is in V and E' is in E, such that:
+ - V' is the set of vertices reachable from s in G,
+ - G' forms a rooted tree with root s, and
+ - for all v in V'. the unique simple path from s to v in G' is a shortest path from s to v in G.
+
+Relaxation (technique)
+For each vertex v in V, we maintain an attribute v.d, which is an upper bound on the weight of a shortest oath from s to v. We call v.d a "shortest-path estimate".
+We initialize the shortest-path estimates and predecessors using the following O(V)-time procedure:
+INITIALIZE-SINGLE-SOURCE(G,s)
+  for each vertex v in G.V
+    v.d = ∞
+    v.π = nil
+  s.d = 0
+The process of "relaxing" an edge (u,v) consists of testing whether we can improve the shortest path to v found so far by going through u and, if so, updating v.d and v.π:
+RELAX(u, v, w)  // O(1) time
+  if v.d > u.d + w(u,v)
+    v.d = u.d + w(u,v)
+    v.π = u
+Relaxation is the only means by which shortest-path estimates and predecessors change (though various algorithms we'll cover differ in how many times they might relax a given egde).
+
+Properties of shortest paths and relaxation (formally proven in section 24.5)
+ - Triangle inequality: for an edge (u,v) in E, we have 𝛿(s,v) <= 𝛿(u,v) + w(u,v)
+ - Upper-bound property: We always have v.d >= 𝛿(s,v) for all vertices v in V, and once v.d achieves the value 𝛿(s,v), it never changes.
+ - No-path property: If there is no path from s to v, then we always have v.d = 𝛿(s,v) = ∞.
+ - Convergence property: If s -> u -> v is a shortest path in G for some u,v in V, and if u.d = 𝛿(s,u) at any time prior to relaxing edge (u,v), then v.d = 𝛿(s,v) at all times afterward.
+ - Path-relaxation property: If p=<v0,v1,...,vk> is a shortest path from s=v0 to vk, and we relax the edges of p in the order (v0,v1),(v1,v2),...,(vk-1,vk), then vk.d=𝛿(s,vk). This property holds regardless of any other relaxation steps that occur, even if they are intermixed with relaxations of the edges of p.
+ - Predecessor-subgraph property: Once v.d = 𝛿(s,v) for all v in V, the predecessor graph is a shortest-paths tree rooted at s.
+
+-=- The Bellman-Ford algorithm
+Solves the SSSP problem for a weighted, directed graph. Edge weights may be negative.
+Returns a boolean indicating whether any negative weight cycles are reachable from s. Returns true if no such cycles, the algo produces the shortest paths and their weights.
+See example in code in this repo. 

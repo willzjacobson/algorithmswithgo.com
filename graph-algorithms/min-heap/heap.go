@@ -5,6 +5,10 @@ import (
 	"fmt"
 )
 
+// Application of a min heap where the satellite data is an adjacency-list vertex
+// We store the index in the AdjListVertex type itself to be able to use the DecreaseKeys method in our implementation Prim's algorthim
+// This may violate the principle of separation of concerns, but *shrug*
+
 type MinHeapNode struct {
 	right     *MinHeapNode
 	left      *MinHeapNode

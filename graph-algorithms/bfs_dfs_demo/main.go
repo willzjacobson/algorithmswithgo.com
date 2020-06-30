@@ -19,14 +19,14 @@ var (
 	x = adjacencylist.CreateAdjListVertex("x")
 	y = adjacencylist.CreateAdjListVertex("y")
 	// for DFS demo
-	a  = adjacencylist.CreateAdjListVertex("a")
-	b  = adjacencylist.CreateAdjListVertex("b")
-	c  = adjacencylist.CreateAdjListVertex("c")
-	d  = adjacencylist.CreateAdjListVertex("d")
-	e  = adjacencylist.CreateAdjListVertex("e")
-	f  = adjacencylist.CreateAdjListVertex("f")
-	gg = adjacencylist.CreateAdjListVertex("g")
-	h  = adjacencylist.CreateAdjListVertex("h")
+	a = adjacencylist.CreateAdjListVertex("a")
+	b = adjacencylist.CreateAdjListVertex("b")
+	c = adjacencylist.CreateAdjListVertex("c")
+	d = adjacencylist.CreateAdjListVertex("d")
+	e = adjacencylist.CreateAdjListVertex("e")
+	f = adjacencylist.CreateAdjListVertex("f")
+	g = adjacencylist.CreateAdjListVertex("g")
+	h = adjacencylist.CreateAdjListVertex("h")
 )
 
 func buildTestAdjListForBFS() *adjacencylist.AdjacencyList {
@@ -51,34 +51,34 @@ func buildTestAdjListForDFS() *adjacencylist.AdjacencyList {
 	l.Adj[a] = []*adjacencylist.AdjListVertex{e}
 	l.Adj[b] = []*adjacencylist.AdjListVertex{a, f}
 	l.Adj[c] = []*adjacencylist.AdjListVertex{b, f}
-	l.Adj[d] = []*adjacencylist.AdjListVertex{gg, h}
+	l.Adj[d] = []*adjacencylist.AdjListVertex{g, h}
 	l.Adj[e] = []*adjacencylist.AdjListVertex{b}
 	l.Adj[f] = []*adjacencylist.AdjListVertex{e}
-	l.Adj[gg] = []*adjacencylist.AdjListVertex{c, f}
-	l.Adj[h] = []*adjacencylist.AdjListVertex{gg, d}
+	l.Adj[g] = []*adjacencylist.AdjListVertex{c, f}
+	l.Adj[h] = []*adjacencylist.AdjListVertex{g, d}
 	return l
 }
 
 func main() {
 	// Breadth First Search demo
 	fmt.Println("-=-=- BFS")
-	g := buildTestAdjListForBFS()
-	bfs.BFS(g, s)
+	graph := buildTestAdjListForBFS()
+	bfs.BFS(graph, s)
 	fmt.Println("path from s to s:")
-	bfs.PrintTree(g, s, s)
+	bfs.PrintTree(graph, s, s)
 	fmt.Println("-=-")
 	fmt.Println("path from s to t:")
-	bfs.PrintTree(g, s, t)
+	bfs.PrintTree(graph, s, t)
 	fmt.Println("-=-")
 	fmt.Println("path from s to y:")
-	bfs.PrintTree(g, s, y)
+	bfs.PrintTree(graph, s, y)
 	fmt.Println("-=-")
 	fmt.Println("path from s to u:")
-	bfs.PrintTree(g, s, u)
+	bfs.PrintTree(graph, s, u)
 	fmt.Println("-=-")
 	z := adjacencylist.CreateAdjListVertex("z") // unconnected vertex
 	fmt.Println("path from s to z (does not exist):")
-	bfs.PrintTree(g, s, z)
+	bfs.PrintTree(graph, s, z)
 
 	// Depth First Search demo
 	fmt.Println("\n-=-=- DFS")
@@ -90,6 +90,6 @@ func main() {
 	fmt.Println(d)
 	fmt.Println(e)
 	fmt.Println(f)
-	fmt.Println(gg)
+	fmt.Println(g)
 	fmt.Println(h)
 }

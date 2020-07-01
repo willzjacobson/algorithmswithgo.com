@@ -192,4 +192,21 @@ Properties of shortest paths and relaxation (formally proven in section 24.5)
 -=- The Bellman-Ford algorithm
 Solves the SSSP problem for a weighted, directed graph. Edge weights may be negative.
 Returns a boolean indicating whether any negative weight cycles are reachable from s. Returns true if no such cycles, the algo produces the shortest paths and their weights.
+Runtime: O(EV)
 See example in code in this repo. 
+
+-=- Single-source shortest paths in directed acyclic graphs (dags)
+By relaxing the edges of a weighted dag according to a topological sort of its vertices, we can compute shortest oaths from a single source in O(V+E).
+Sorting imposes a linear ordering of its vertices. If the dag contains a path from vertex u to v, then u precedes in the topological sort.
+That means we need to make just 1 pass over the dag's vertices in topological order, and at each vertex, relax each edge that leaves the vertex.
+See example in code in this repo of the DAG-SHORTEST-PATHS algo. 
+
+Application:
+One application of this algo arises in deterining creitical paths in PERT (program evaluation and review technique) chart anaylists.
+Edges represent jobs, and edge weights preresent time to complete them. If edge (u,v) enters vertex v and edge (v,x) leaves v, job (u,v) must be performed before job (v,x).
+A path through the dag represents a sequence of jobs that must be performed in a perticular order. A "citical path" is a longest oath through the dag, corresponding to the longest sequence of jobs. Thus, the weight of a critical path provides a lower bound on the time to perform all the jobs.
+We can find a critical path by either:
+ - negating edge weights and running DAG-SHORTEST-PATHS, or
+ - running DAG-SHORTEST-PATHS with ∞ swapped with -∞ in INITIALIZE-SINGLE-SOURCE, and ">" swapped with "<" in the RELAX procedure.
+
+-=- Dijkstra's Algorithm

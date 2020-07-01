@@ -2,15 +2,16 @@ package adjacencylist
 
 // AdjListVertex : representation of a vertex in a graph, as modeled by an adjacency list
 type AdjListVertex struct {
-	Value string
-	Color string         // used by the BFS algorithm
-	D     float64        // value is assigned by the BFS algorithm (and also in the distance algos)
-	P     *AdjListVertex // used in the BFS algorithm to create a breadth-first tree
-	Start int            // used as timestamp by DFS algorithm
-	End   int            // used as timestamp by DFS algorithm
-	rank  int            // used to manage disjoint sets of vertices in Kruskal's algo for determining a minimum spanning tree (MST) for a graph
-	Key   float64        // used in prim's MST algo to manage the min-heap
-	Index int            // used in prim's MST algo to manage the min-heap (to provide index for DecreaseKeys method)
+	Value  string
+	Color  string         // used by the BFS algorithm
+	D      float64        // value is assigned by the BFS algorithm (and also in the distance algos)
+	P      *AdjListVertex // used in the BFS algorithm to create a breadth-first tree
+	Start  int            // used as timestamp by DFS algorithm
+	End    int            // used as timestamp by DFS algorithm
+	rank   int            // used to manage disjoint sets of vertices in Kruskal's algo for determining a minimum spanning tree (MST) for a graph
+	Key    float64        // used in prim's MST algo to manage the min-heap
+	Index  int            // used in prim's MST algo to manage the min-heap (to provide index for DecreaseKeys method)
+	Weight float64        // used by Topological Sort method in DAG-SHORTEST-PATHS algo
 }
 
 // CreateAdjListVertex : creates a new Vertex

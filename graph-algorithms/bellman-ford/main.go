@@ -8,7 +8,6 @@ import (
 
 // create vertices to be referenced below
 var (
-	// for Krushal's algo demo
 	s = adjacencylist.CreateAdjListVertex("s")
 	t = adjacencylist.CreateAdjListVertex("t")
 	x = adjacencylist.CreateAdjListVertex("x")

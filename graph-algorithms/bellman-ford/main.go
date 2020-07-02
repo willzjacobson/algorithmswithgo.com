@@ -87,15 +87,15 @@ func BellmanFordSSSP(l *adjacencylist.Weighted, s *adjacencylist.AdjListVertex) 
 	return true
 }
 
-// PrintShortestPathsTree : helper to show the shortest path from the source vertex to any vertex v
-func PrintShortestPathsTree(s, v *adjacencylist.AdjListVertex) {
+// PrintShortestPath : helper to show the shortest path from the source vertex to any vertex v
+func PrintShortestPath(s, v *adjacencylist.AdjListVertex) {
 	if s == v {
 		fmt.Print("->", v.Value)
 		fmt.Println()
 		return
 	}
 	fmt.Print("->", v.Value)
-	PrintShortestPathsTree(s, v.P)
+	PrintShortestPath(s, v.P)
 }
 
 func main() {
@@ -103,8 +103,8 @@ func main() {
 	containsNoNegativeWeightCycles := BellmanFordSSSP(l, s)
 	fmt.Println("The input graph contained no negative weight cycles:", containsNoNegativeWeightCycles)
 	fmt.Println("-=- Shortest paths from x to other vertices:")
-	PrintShortestPathsTree(s, y)
-	PrintShortestPathsTree(s, x)
-	PrintShortestPathsTree(s, t)
-	PrintShortestPathsTree(s, z)
+	PrintShortestPath(s, y)
+	PrintShortestPath(s, x)
+	PrintShortestPath(s, t)
+	PrintShortestPath(s, z)
 }

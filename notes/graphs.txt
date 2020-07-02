@@ -210,3 +210,20 @@ We can find a critical path by either:
  - running DAG-SHORTEST-PATHS with ∞ swapped with -∞ in INITIALIZE-SINGLE-SOURCE, and ">" swapped with "<" in the RELAX procedure.
 
 -=- Dijkstra's Algorithm
+Solves the single-source shortest-paths problem on a weighted graph when all edges have nonegative weights. Why bother when we already have Bellman-Ford algo? Lower runtime.
+The algorithm:
+  - Maintains a set S of vertices whose final shortest-path weights from source s have already been determined. 
+  - Repeatedly selects the vertex u from V-S with the minimum shortest path estimate, ads u to S, and relaxes all edges leaving u.
+  - Uses a min priority queue of vertices, keyed by their d (distance from source) values.
+The resulting predecessor subgraph Gπ is a shortest-paths tree rooted at source vertex s.
+Dijkstra's algo resembles BFS in that it assigns vertices their distances the first time it sees them. I also resembeds Prim's algo in that both use a min queue to find the nearest "white" vertes outside a given set.
+See example in code in this repo of DIJKSTRA's algo.
+Runtime:
+ - Initializing the min queue is O(V) (that's not in a loop, so winds up not mattering)
+ - The while loop runs once for each index.
+   - we extract the min from the queue O(1)
+   - we loop through each edge as index has (since we're in that brings us to O(V+E))
+     - we call relax, which implicitly has a Queue.DecreaseKey call, which is on its own is O(lg v)
+Thus, using a binary heap, we're at O((lg V)*(V+E)). That becomes O(E lg V) if all vertices are reachable from the source.
+Potential improvement: a Fibonacci heap would do ExtractMin in O(lg V), and DecreaseKey in O(1). Thus, if we swap out a the binary heap for a Fibonacci heap, we could acheive O(Vlg v + E).
+Historically, development Fibonacci heap was actually motivated by the fact that Dijkstra's algo typically makes many more DecreaseKey calls than ExtractMin calls. So in this case, a Fib heap lets us shift the cost of the queue operations up out of the inner loop. 

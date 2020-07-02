@@ -227,3 +227,5 @@ Runtime:
 Thus, using a binary heap, we're at O((lg V)*(V+E)). That becomes O(E lg V) if all vertices are reachable from the source.
 Potential improvement: a Fibonacci heap would do ExtractMin in O(lg V), and DecreaseKey in O(1). Thus, if we swap out a the binary heap for a Fibonacci heap, we could acheive O(Vlg v + E).
 Historically, development Fibonacci heap was actually motivated by the fact that Dijkstra's algo typically makes many more DecreaseKey calls than ExtractMin calls. So in this case, a Fib heap lets us shift the cost of the queue operations up out of the inner loop. 
+
+-=- Difference constraints and shortest paths

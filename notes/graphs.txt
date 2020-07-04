@@ -228,4 +228,69 @@ Thus, using a binary heap, we're at O((lg V)*(V+E)). That becomes O(E lg V) if a
 Potential improvement: a Fibonacci heap would do ExtractMin in O(lg V), and DecreaseKey in O(1). Thus, if we swap out a the binary heap for a Fibonacci heap, we could acheive O(Vlg v + E).
 Historically, development Fibonacci heap was actually motivated by the fact that Dijkstra's algo typically makes many more DecreaseKey calls than ExtractMin calls. So in this case, a Fib heap lets us shift the cost of the queue operations up out of the inner loop. 
 
--=- Difference constraints and shortest paths
+-=- All-Pairs Shortest Paths
+Here we consider the problem of, given a weighted, directed graph, finding shortest paths between all pairs of vertices in a graph. For example, making a table of distances between all paris of cities for a road atlas. 
+In these problems we typically want the output in tabular form: the entry in u's row and v's column should be the weight of a shortest path from u to v.
+We can solve these problems by running single-source shortest-paths algos |V| times. 
+If all edge weights are nonnegative, we can use Dijkstra's algo:
+ - using the linear-array implementation of the min-priority queue, the running time is O(V^3 + VE) = O(V^3).
+ - the binary min-heap queue implementation yields a running time of O(V E lg V), which is an imrprovement if the graph is sparse.
+ - If we use a Fibonacci heap for the queue, that yields O(V^2 lg V + VE)
+If the graph has negative edges, we use the slower Bellman-Ford algo once for each vertex:
+ - the resulting running time is O(V^2 E), which on a dense graph is O(V^4).
+ - We will show how to do better than that below.
+
+These methods typically represent the graph with an adjacency-matrix. We number vertices 0 - |v|-1, so that the input is an nxn matric W representing the edge weights of an n-vertex directed graph G=(V,E). That is, W=(wij), where wij=0 if i=j, the weight of the directed edge (i,j), or ∞ if there is no edge (i,j) in G. Allow negative edge weights, but assume for now no negative cycles exist.
+The tabular output of the all-pairs shortest-paths algos is represented in an nxn matrix D=(dij), where entry dij contains the weight of a shortest path from vertex i to vertex j. 
+
+However, we need to compute not only the shortest-paths weights, but also a predecessor matrix. π, where πij is nil if i=j or there is no path from i to j, or πij is the predecessor of j on a shortest path from i to j.
+Just as the predecessor subgraph referred to above is a shortest-paths tree for a given source vertex, the subgraph induced by the ith row of the π matrix should be a shortest-paths tree with root i. 
+For each vertex i in V, we define the predecessor subgraph of G for i as Gπ,i = (Vπ,i, Eπ,i), where:
+ - Vπ,i is a set of vertices j for which πij != nil.
+ - Eπ,i is a set of edges (πij,j), where j is in Vπ,i, not including i.
+The following procedue should pring a shortest path from vertex i to vertex j:
+PRINT-ALL-PAIRS-SHORTEST-PATH(π,i,j)
+  if i == j
+    print i
+  else if πij == null
+    print "no path from " i "to" j + "exists"
+  else
+    PRINT-ALL-PAIRS-SHORTEST-PATH(π,i,πij)
+    print j
+
+conventions:
+ - input graph G=(V,E) has n vertices, so |V| = n.
+ - denote matrices by uppercase letters (such as W, L, or D) and their individual elements by subscripted lowercase letters (wij, lij, dij).
+ - some matrices will have parenthesized superscripts, as in L(m) = (l(m)ij), or D(m) = (d(m)ij) to indicate iterates.
+ - assume in the examples in the notes that the number of rows in an nxn matrix a is stored in the attribute A.rows.
+
+Shortest Paths and matrix multiplication
+Here we present a synamic-programming algo for the all-pairs shortest-paths problem in a sirected graph G=(V,E).
+Each loop will invoke an operation similar to matrix multiplication. We'll start with a O(V^4) implementation, then get it down to O(V^3 lg V).
+
+O(V^4) implementation:
+We know the shortest paths problems already have optimal substructure for dynamic-programming, since all subpaths of a shortest path are themselves shortest paths.
+Our initial solution starts with the observation that W is the shortest-paths matrix when considering paths that have m=1 edge.
+It then performs n-2 loops, extending the shortest paths computed so far by 1 edge each time through loop using a helper function EXTEND-SHORTEST-PATHS(L,W).
+EXTEND-SHORTEST-PATHS(L,W) takes the previous shortest paths matrix L(m), which contains all shortest paths of maximum length m, and uses W to compute L(m+1).
+We do this n-1 times, since all shortest paths will have at most n-1 edges if G contains no negative weight cycles.
+EXTEND-SHORTEST-PATHS builds the next L(m) from W and L(m-1) using this key operation:
+  l(m)ij = min(l(m-1)ij, l(m-1)ik + wkj), where for k we try all possible predecessors of vertex j.
+The EXTEND-SHORTEST-PATHS operation resembles matric multiplaction in its triple nested loop structure, and runs in O(V^3). Looping through it |V| times this takes O(V^4) time.
+
+Improving the O(V^4) Implementation
+We don't actually want all the L(m) matrices; we only really care about L(n-1).
+Due to the similarity between EXTEND-SHORTEST-PATHS and matrix multiplaction, we can sort of summarize our algo thus far like this:
+  L(1) = L(0) * W = W
+  L(2) = L(1) * W = W2
+  L(3) = L(2) * W = W3
+  ...
+  L(n-1) = L(n-2) * W = Wn-1
+Just as traditional matrix multiplication is associative, so is the matrix operation defined by EXTEND-SHORTEST-PATHS. We cat therefore compute L(n-1) with only lg(n-1) matrix products via the sequence:
+  L(1) = W
+  L(2) = W * W
+  L(4) = W2 * W2
+  L(8) = W4 * W4
+  ...
+etc. up until m >= n-1. This technique is called "repeated sqauring". (see example implementation in this repo).
+This gives us a running time of O(lg v V^3).

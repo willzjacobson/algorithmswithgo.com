@@ -336,3 +336,52 @@ A recursive definition of t(k)ij is:
     i if i == j or an edge exists between i and j
   for k>0, t(k)ij = t(k-1)ij || t(k-1)ik && t(k-1)kj
     that is, t(k)ij will be true if either t(k-1)ij is true, or if t(k-1)ik=true and t(k-1)kj=true (a path exists between i and k, and between k and j).
+
+-=- Johnson's algorithm for sparse graphs
+Johnson's (J) algorith finds shortest paths between all pairs in O(V^2 lg V + VE) time. It is asymptotically faster than either repeated squaring or the FW algo for sparse graphs (where E < V^2).
+The algo either returns a matrix of shortest-path weights for all pairs of vertices or reports that the input graph contains a negative-weight cycle.
+J uses both Dijkstra's algo and the Bellman-Ford algo.
+
+J uses "reweighting":
+  - If all edge weights w in a graph G=(V,E) are nonnegative, we can find shortest paths between all pairs of vertcies using Dijkstra once from each vertex. With the Fibonacci heap min-priority queue, running time of this solution is O(V^2 lg V +VE). 
+  - If G has negative weight edges but no negative-weight cycles, we compute a new set of nonnegative edge weights that allows us to use the same method. New set of edge weights w' must satsify the following 2 properties:
+    - shortest paths between all pairs of vertices calculated using the weight function w' must be the same as those calculated using w.
+    - for all edges (u,v), the new weight w'(u,v) is nonnegative.
+  - We can preprocess G to determine the new weight function w' in O(VE) time.
+
+Reweighting preserves shortest paths
+Given a weighted, directed graph G=(V,E) with weight function w : E->R, let h : V -> R be any function mapping vertices to rel numbers.
+Then, for each edge (u,v) in E, we define:
+  w'(u,v) = w(u,v) + h(u) - h(v).
+Lemma: Let p=<v0,v1,...,vk> be any path from vertex v0 to vk. Then:
+  1) p is a shortest path from v0->vk with weight function w if and only if it is a shortest path with weight function w'. That is w(p)=𝛿(v0,vk) if and only if w'(p)=𝛿'(v0,vk). 
+    Proof: This is true because
+      sum i->k( w'(vi-1,vi) ) = sum i->k( w(vi-1,vi) + h(vi-1) - h(vi) ) = sum i->k( w(vi-1,vi) ) + h(v0) - h(vk) = w(p) + h(v0) - h(vk).
+    h(v0) and h(vk) do not depend on the path, so if 1 path from v0->vk is shorter than another using w, the same is true using w'.
+  2) G has a negative-weight cycle using weight function w if and only if G has a negative-weight cucle using weight function w'. 
+    Proof: Consider any cycle c=<v0,v1,...,vk>, where v0=vk.
+    We have w'(c) = w(c) + h(v0) - h(vk) = w(c). 
+    Thus, c has negative weight using w if and only if it has negative weight using w'.
+
+Producing nonnegative weights by reweighting
+Now we must endure w'(u,v) >= 0 for all edges (u,v) in E.
+Given a weighted, directed graph G=(V,E), we make a new graph G'=(V',E'), where:
+  - V' = V u s (s is a new vertex)
+  - E' = E u (s,v) for all v in V. 
+  - w(s,v)=0 for all v in V. 
+  We know that no shortest paths go through s since no edges point to s. Also, G' has no negative cycles if and only if G has no negative cycles.
+Now, suppose G and G' have no negative-weight cycles. Let us define
+  h(v) = 𝛿(s,v) for all v in V. By the "triangle inequality" (24.10), we have:
+  h(v) <= h(u) + w(u,v) for all edges (u,v) in E'. 
+Moving things around gives us:
+  0 <= w(u,v) + h(u) - h(v). 
+Since w'(u,v) = w(u,v) + h(u) - h(v), we have:
+  w'(u,v) >= 0.
+
+The Algo
+Johnson's Algo assumes the edges are stored in adjacency-lists. 
+It returns the usual |V| X |V| matrix D=dij, where dij = 𝛿(i,j), or it reports that the input graph contains a negative weight cycle.
+As is typical in an all-pairs shortest-paths algo, we assume the vertices are numbered from 1 to |V|.
+running time:
+  - Using a Fibonacci heap for the min-queue in Dijksctra's algo yields O(V^2 lg V + VE) for J's algo.
+  - A binary heap yields O(VE lg V), which is still better than the Floyd-Warshall algo if the graph is sparse (such as for a roadmap of cities).

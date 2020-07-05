@@ -1,15 +1,13 @@
 package main
 
 import (
+	"algo/graph-algorithms/all-pairs-shortest-paths/helpers"
 	"fmt"
 	"math"
 )
 
-type adjacencyMatrixRow []float64
-type adjacencyMatrix []adjacencyMatrixRow
-
-func generateStartingAdjacencyMatrix() adjacencyMatrix {
-	return adjacencyMatrix{
+func generateStartingAdjacencyMatrix() helpers.AdjacencyMatrix {
+	return helpers.AdjacencyMatrix{
 		{0, 3, 8, math.Inf(1), -4},
 		{math.Inf(1), 0, math.Inf(1), 1, 7},
 		{math.Inf(1), 4, 0, math.Inf(1), math.Inf(1)},
@@ -18,22 +16,10 @@ func generateStartingAdjacencyMatrix() adjacencyMatrix {
 	}
 }
 
-// helper to generate an empty nxn matrix containing +∞ in all entries
-func generateNewMatrix(n int) adjacencyMatrix {
-	m := adjacencyMatrix{}
-	for i := 0; i < n; i++ {
-		m = append(m, adjacencyMatrixRow{})
-		for j := 0; j < n; j++ {
-			m[i] = append(m[i], math.Inf(1))
-		}
-	}
-	return m
-}
-
-func extendShortestPaths(l adjacencyMatrix, w adjacencyMatrix) adjacencyMatrix {
+func extendShortestPaths(l helpers.AdjacencyMatrix, w helpers.AdjacencyMatrix) helpers.AdjacencyMatrix {
 	// generate a new matrix that will contain the extended shortest paths
 	n := len(l)
-	lNext := generateNewMatrix(n)
+	lNext := helpers.GenerateNewMatrix(n, math.Inf(1))
 	// determine the value of each entry of the new shortest paths matrix (requies 3 nested loops, like matrix multiplication)
 	for i := 0; i < n; i++ {
 		for j := 0; j < n; j++ {
@@ -50,7 +36,7 @@ func extendShortestPaths(l adjacencyMatrix, w adjacencyMatrix) adjacencyMatrix {
 }
 
 // O(V^4) implementation
-func slowAllPairsShortestPaths(w adjacencyMatrix) adjacencyMatrix {
+func slowAllPairsShortestPaths(w helpers.AdjacencyMatrix) helpers.AdjacencyMatrix {
 	n := len(w)
 	l := w
 	// loop |E|-2 times (since the shortest paths will be m=|E|-1 at longest,
@@ -62,7 +48,7 @@ func slowAllPairsShortestPaths(w adjacencyMatrix) adjacencyMatrix {
 }
 
 // O(V^4) implementation
-func fasterAllPairsShortestPaths(w adjacencyMatrix) adjacencyMatrix {
+func fasterAllPairsShortestPaths(w helpers.AdjacencyMatrix) helpers.AdjacencyMatrix {
 	n := len(w)
 	l := w
 	m := 1

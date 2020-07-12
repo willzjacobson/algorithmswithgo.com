@@ -1,0 +1,231 @@
+-=- Intro
+"Chip microprocessors" now contain a single multi-core integrated circuit chip that houses multiple processing "cores", each of which is a full-fledged processor that can access common memory.
+Parallel computers (computers with multiple processing units) are now common.
+Some parallel computers feature "shared memory", where each processor can directly access any location of memory. Others employ "distributed memory", where each processor'smemory is provate, and an explicit message but be sent for one processor to access the memory of another.
+Now,with the advent of multicore technology, every new laptop & desktop machine is a shared-memory parallel computer. This chapter is about that.
+One common means of programming chip multiprocessors (and other shared-memory parallel computers) is by using "static threading", which provides a software abstraction of "virtual processors", or "threads", sharing common memory. Each thread executes code independently of other threads. The OS loads a thread into a processor for execution, then swaps it out for another. These operations are slow, and can be complex for the programmer to manage, particularly to evenly load-balance the work.
+This has led to the creation of "concurrency platforms", which provide a layer of software that coordinates, schedules, and manages parallel-computing resources. Some are built into libraries, and others are full on languages with compiler & runtime support (Node && Go?).
+
+-=- Dynamic multithreaded programming
+"Dynamic multithreading" is an important class of concurrency platform. This is what we adopt in this chapter.
+It allows programmers to specify parallelism in applications without worrying about communicatino protocols, load balancing, etc. The concurrency platform contains a scheduler, which load-balances the computation automatically.
+Though dynamic-multithreading environments are involving, they generally support:
+  1) nested parallelism: allows a subroutine to be "spawned", allowing the caller to proceed while the spawned subroutine is computing its result.
+  2) parallel loops: like an ordinary "for" loop, except the iterations can execute concurrently.
+
+-=- The basics of dynamic multithreading
+Concepts of spawning and syncing:
+  - "spawn" create a child process that can run in parallel as the parent continues
+  - "sync" indicates the program must wait for all spawned processes to finish before proceeding.
+
+-=- A model for multithreaded execution
+Can think of a multithreaded computation as a directed acyclic graph (dag) G=(V,E), called a "computation dag". The vertices represent instructions, and the edges represent dependencies between instructions ((u,v) means u must execute before v).
+If a chain of instructions contains no parallel control, they are grouped in a single "strand". Instructions including parallel control are not included in strands, but represented in the structure of the dag.
+For example, if a strand has two successors, one of them must have been "spawned", and a strand with multiple predecessors indicates the predecessors joined because of a "sync" statement.
+We can picture a multithreaded computation as a dag of strands embedded in a tree of procedure instances (function calls, for example). See Figure 27.2. 
+If G has a directed path from strand u to strand v, we say the 2 strands are "(logically) in series". Else, they are "(logically) in parallel". 
+Types of edges in a computation dag:
+ - continuation edge: drawn horizontally in 27.2, connects a strand u to its successor u' within the same procedure instance.
+ - spawn edge: when a strand u spawns a strand v. A vertex from which a spawn edge leaves will also have a continuation edge, since control has to go somewhere. Thus, branching indicates spawing (and merging indicates a "sync" call).
+ - call edge: normal procedure calls.
+ - return edge: indicates a sync.
+A computation starts with a single "initial strand" and ends with a single "final strand".
+
+Performance measures
+ - the "work" of a multithreaded computation is the total time to execute the entire computation on one processor. In other words, ths sum of the times taken by each strand. The work is the running time on a single processor: T1.
+ - the "span" is the longest time to execute the strands along any path in the dag. If each strand takes unit time, the span is the number of vertices along the longest (critical path). We can find the critical path of a dag in O(V+E) time (from ch. 24). The span is the running time if each strand could be run on its own processor, denoted by T∞.
+ - The lower bound of the running time of a multithreaded algo is controlled by the span (which is T∞). 
+    For example, for the recursive form of Fib, Fib(n-1) and Fib(n-2) run in parallel, so T∞ = max(T∞(n-1), T∞(n-2))+ O(1) = T∞(n-1)+ O(1).
+ - To denote running time of a multithreaded computation of preprocessors, we use Tp.
+Workand span provide lower bounds on Tp.
+  Work Law: Tp >= T1/P, since P processors can do at most P units of work at a time.
+  Span Law: Tp >= T∞, since you can't do any better than a machine with ∞ processors.
+ - The "speedup" is the ration T1/Tp, which says how many times faster the computation is on P processors than on 1. If T1/Tp=P, we have "perfect linear speedup".
+ - The "parallelism" is defined as T1/T∞ (ratio of work to span). We can view parallelism in 3 perspectives:
+    - It denotes the average amount of work that can be performed in parallel for each step along the critical path.
+    - Gives the maximum possible speedup that can be acheived by any number of processors.
+    - Once P exceeds the parallelism, we get deminishing returns by adding more processors.
+When 2 subcomputations are joined in series, the work of the composition is the sum of their work, and the span is the sum of their spans. When 2 subcomputations are joined in parallel, the work of the composition is still the sum of their work, but the span is the maximum between the 2 spans.
+ - 10x more parallelism than processors generally suffices to give good speedup.
+ - On an ideal parallel computer with P processors, a "greedy scheduler" executes a multithreaded computation with work T1 and span T∞ in time:
+    Tp <= T1/P + T∞.
+   An optimization for a computation with x processors can actually slow the computation for y processors. Thus, work and span sometimes provide a better means of extrapolating performance than measured running times.
+ 
+
+Scheduling
+The sceduler maps the strands to static threads, and the operating system schedules the threads on the processors themselves.
+
+-=- Parallel Loops
+Many algorithms contain loops all of whose iterations can operate in parallel. 
+For example, multiplying an nxn matrix A=(aij) by an n-vector x=(xi). 
+MAT-VEC(A,x)
+  n = A.rows
+  let y be a new vector of length n
+  parallel for i=1 to n   // fill new vector y with 0's in parallel
+    yi = 0
+  parallel for i=1 to n  // forform each iteration in parallel
+    for new j=1 to n  // "new" means the variable j only lives within this iteration, to preclude race conditions
+      yi = yi + aij*xj
+  return y
+
+A compiler can implement each parallel for loop as a divide-and-conquer subroutine using nexted parallelism. 
+The 2nd parallel for loop can be implemented by this subroutine:
+MAT-VEC-MAIN-LOOP(A,x,y,n,i,i')
+  if i==i'
+    for j=1 to n
+      yi = yi + aij*xj
+  else mid = (i'-i)/2
+    spawn MAT-VEC-MAIN-LOOP(A,x,y,n,i,mid)  // "spawn" means create a parallel process
+    MAT-VEC-MAIN-LOOP(A,x,y,n,mid+1,i')
+    sync  // "sync" means wait for child process to complete so can rejoin the main process
+This code recursively spawns the first hald of the iteratins of the loop to execute in parallel with the 2nd half of the iterations.
+This creates a binary tree of execution where the leaves are individual loop iterations. 
+Complexity:
+  Work:
+  - The work required by MAT-VEC-MAIN-LOOP is O(n^2). This is also the running time if performed serially rather than in parallel.
+  - The work of spawning and syncing does add work, but not asymptotically. That's because we do n spawn and sync calls, and managing of the recursive parallel tree is O(lg n). Thus, the running time of the MAT-VEC-MAIN-LOOP is O(n^2), since n^2 > n lg n.
+  Span:
+  - We must also account for the overhead of recursive spawning when analyzing the span of a parallel-loop construct. The depth of recursive calling is logarithmic in the number of iterations,so for a parallel loop with n iterations, in which the iteration has a span iter∞(i), the span is:
+    T∞(n) = O(lg n) + max(iter∞(i)).
+  - The span of the first parallel loop in MAT-VEC is this O(lg n), since each iteration completes in constant time.
+  - The span of the first parallel loop in MAT-VEC is this O(n), since each iteration completes in O(n) time, which dominates the lg n cost of the parallelism.
+
+-=- Race Conditions
+A multithreaded algo is "deterministic" if it always does the same thing on the same input. Otherwise, it is "nondeterministic".
+A "determinacy race" occurs when 2 logically parallel instructions access the same memory location and at least 1 of the instructions performs a write.
+For example:
+RACE-EXAMPLE()
+  x = 0
+  parallel for i=1 to 2
+    x = x+1
+  print x
+RACE-EXAMPLE creates 2 parallel strands, each of which incrememnts x. Expected end value of x is 2, but it can be 1 if both reads occur before the first write.
+This bug can be very hard to find, since often most possible orderings of the internal steps do not produce them.
+There are ways to protect against race conditions using exclusion locks, we will do so simply by ensuring that strands operate in parallel are "independent". Thus, in a "parallel for" construct, all the iterations should be independent. This is why we do not make the inner for loop of MAT-VEC parallel.
+Between a "spawn" and the corresponding "sync", the code of the spawned child should be independent of the code of the parent, including code executed by additional spawned or called children.
+
+-=- Multithreaded Matrix Multiplication
+Standard serial implementation is O(n^3).
+First we'll do a straight forward implementation, then we'll investigate a divide-and-conquer approach.
+
+P-SQUARE_MATRIX_MULTIPLY(A,B)
+  n = A.rows
+  let C be a new nxn matrix
+  parallel for i=1 to n
+    parallel for j=1 to n
+      cij = new k=1 to n
+      for new k=1 to n
+        cij = cij + aik*bki
+  return C
+Work is T1(n) = O(n^3) (same as running time of serial implementation, without the "parallel"s.
+Span is T∞(n) = O(n), bc it follows a path down a tree of recursion for one parallel for loop, then another, and then executes all n iterations of the inner loop.
+  Thus, the total span is O(lg n) + O(lg n) + O(n) = O(n).
+Parallelism: T1(n)/T∞(n) = O(n^2).
+
+Divide-and-conquer approach
+Strassen's method calculates the product of 2 nxn matrices in O(n^(lg 7) time, but it's pretty complicated. 
+Here's we'll parallelize a divide-and-conquer approach that is O(n^3) (work) serially, but run in O((lg n)*(lg n)) (span) in parallel. 
+ - We break up each nxn matrix into 4 quadrants (we gloss over the indexing challenges here) and recursively multiply those, then put them back together.
+ - All the recursive calls except 1 are run by spawned child processes and thus run in parallel with the main process.
+ - The work to break up the matrices is constant, so the span is dominated by the 2 nested parallel calls at the end to recompose the matrices. Thus, the span is O((lg n)*(lg n)). Also written as O(lg^2 n).
+In our implementation, we pass in the matrix to hold the product rather than generate it within.
+
+P-MATRIX-MULTIPLY-RECURSIVE(A,A,B)
+  n = A.rows
+  if n == 1
+    c11 = a11*b11
+  else let T be a new nxn matrix
+    partition A,B,C and T inro n/2 x n/2 submatrices: A11,A12,A21,A22,B11,B12,B21,B22,C11,C12,C21,C22,T11,T12,T21,T22
+    spawn P-MATRIX-MULTIPLY-RECURSIVE(C11,A11,B11)
+    spawn P-MATRIX-MULTIPLY-RECURSIVE(C12,A11,B12)
+    spawn P-MATRIX-MULTIPLY-RECURSIVE(C21,A21,B11)
+    spawn P-MATRIX-MULTIPLY-RECURSIVE(C22,A21,B12)
+    spawn P-MATRIX-MULTIPLY-RECURSIVE(T11,A12,B21)
+    spawn P-MATRIX-MULTIPLY-RECURSIVE(T12,A12,B22)
+    spawn P-MATRIX-MULTIPLY-RECURSIVE(T21,A22,B21)
+    P-MATRIX-MULTIPLY-RECURSIVE(T22,A22,B22)
+    sync
+    parallel for i=1 to n
+      parallel for j=1 to n
+        cij = cij + tij
+
+-=- Multithreaded Merge Sort
+Simply spawning one of the recursive calls in our existing merge-sort implementatin only gets us to a span of O(n).
+Since the work is the same as the serial implementation (O(n lg n)), that gets us parallelism of lg n, which is not great. If we're sorting 10MM elements, parallelism of lg n will only get us linear speedup on a few processors.
+MERGE_SORT'(A,p,r)
+  if p<r
+    q = (p+r)/2  // finding midpoint
+    spawn MERGE_SORT'(A,p,q)
+    MERGE_SORT'(A,p+1,r)
+    sync
+    MERGE(A,p,q,r)
+
+The bottle neck is the O(n) serial MERGE procedure. So lets work on parallelizing that.
+The P-MERGE function required a binary search helper to find the index at which the median of one subarray would fit into the other subarray.
+The helper runs in O(lg n) time.
+
+BIONARY-SEARCH(x,T,p,r)  // x is the median of the other subarray, T is the full array, and p and q are the indices that bound the subarray we want to insert x into.
+  low = p
+  high = max(p, r+1)
+  while low < high
+    mid = (low+high)/2
+    if x <= T[mid]
+      high = mid
+    else low = mid+1
+  return high
+
+We can now write the parallel merge function P-MERGE.
+P-MERGE assumes the 2 subarrausto be merged lie within the same array, but does not assume them to be adjacent within the array.
+P-MERGE takes as an argument an array A into which the merged values should be stored.
+The call P-MERGE(T,p1,r1,p2,r2,A,p3) merges the sorted subarrays T[p1,...,r1] and T[p2,...,r2] into subarray A[p3,...,r3], where
+  r3 = p3 + (r1 - p1 + 1) + (r2 - p2 + 1) - 1
+     = p3 + (r1 - p1) + (r2 - p2) + 1,
+and is not provided as an input.
+
+P-MERGE(T,p1,r1,p2,r2,A,p3)
+  n1 = r1 - p1 + 1
+  n2 = r2 - p2 + 1
+  if n1 < n2  // ensure n1 >= n2 (that is, that the first subarray is longer than 2nd)
+    exchange p1 with p2
+    exchange pr with pr
+    exchange n1 with n2
+  if n1 == 0
+    return  // both subarrays empty
+  q1 = (p1+r1)/2  // median of first subarray
+  q2 = BINARY-SEARCH(T[q1],T,p2,r2)  // find the index of 2nd sorted subarray where the median of the first sorted subarray would fit in
+  q3 = p3 + (q1 - p1)+ (q2 - p2)  // find the index of the merged array where the median of the first sorted subarray will go
+  A[q3] = T[q1]
+  spawn P-MERGE(T,p1,q1-1,p2,q2-1,A,p3)
+  P-MERGE(T,q1+1,r1,q2+1,r2,A,q3+1)
+  sync
+
+Analysis of P-MERGE:
+ - T∞(1) = O(lg^2 n)
+ - T1(1) = O(n)
+ - Parallelism is thus O(n / lg^2 n).
+
+We're now ready to write our actual P-MERGE_SORT method.
+Unlike our serial implementation of MERGE-SORT. P-MERGE-SORT accepts as an argument the array B, which will hold the sorted result.
+Specifically: P-MERGE-SORT(A,p,r,B,s) sorts the elements in A[p..r] and stores them in B[s..s+r+p].
+
+P-MERGE-SORT(A,p,r,B,s)
+  n = r - p + 1  // length of segment of A to sort
+  if n == 1  // base case
+    B[s] = A[p]
+    return
+
+  let T[1..n] be a new array
+  q = (p + r) / 2  // calculate the index at which to divide A into 2 subarrays A[p..q] and A[q+1..r] that will be sorted recursively.
+  q'= q - p + 1  // // calculate number of elements in the first subarray A[p..q]
+  spawn P-MERGE-SORT(A,p,q,T,1)  // recursively sort subarray A[p..q] in a child process that runs in parallel to the main process
+  P-MERGE-SORT(A,q+1,r,T,q'+1)  // recursively sort subarray A[q+1..r]
+  sync  // wait for spawned procedure to complete
+  P-MERGE(T,1,q',q'+1,n,B,s)  // merge the sorted subarrays, now in T[p..q'] and T[q'+1..n], into the the output array B[s..s+r-p]
+
+Analysis of P-MERGE-SORT
+ - T∞(1) = O(lg^3 n)  (kinda complicated how we got there)
+ - T1(1) = O(n lg n)  (the same as serial MERGE-SORT)
+ - Parallelism is thus O(n lg n)/O(lg^3 n) 
+    = O(n / lg^2 n)
+  That's better than the parallelism of O(lg n) that we got from our initial MERGE_SORT' function above.
+An optimized solution would be to use an ordinary serial sort when the size of the array is sufficiently small (perhaps quicksort), to avoid some of the constant cost in the parallel solution.

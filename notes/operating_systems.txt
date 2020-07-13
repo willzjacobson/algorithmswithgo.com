@@ -1,0 +1,42 @@
+-=- Process
+The instance of a computer program that is being executed by one or many threads.
+Contains the program code and its activity.
+May be made up of multiple threads of execution that execute instructions concurrently.
+While a program is a passive collection of instructions, a process is the actual execution of those instructions.
+
+"Multitasking" allows processes to share processors (CPUs) and other system resources.
+While each CPU (core) executes a single task at a time, multitasking allows each processor to switch between tasks that are being executed without having to wait for each task to finish.
+
+-=- Thread (of execution)
+The smallest instance of programmed instructions that can be managed independently by a scheduler, which is typically part of an OS.
+On most OS's, a thread is a component of a process.
+Multiple threads can exits within 1 process, executing concurrently and sharing resources such as memory, while different processes do not share these resources.
+In particular, threads of a process share its executable code and the values of its dynamically allocated variables and non-thread-local variables at any given time.
+
+Threads vs processes
+ - processes are typically independent, whereas threads exist as subsets of a process
+ - processes cary more state than threads, whereas multiple threads within a process share process state as well as memory & other resources.
+ - processes have separate adress spaces, whereas threads share the same adress space.
+ - processes only interact through system-provided inter-process communication mechanisms.
+ - context switching between threads is typically faster than context switching between processes.
+
+Single threading
+processing 1 command at a time.
+
+Multithreading
+Allows multiple threads to exist within 1 process.
+The threads share the processes' resources, but operate independently. Allows concurrent execution.
+Multithreading can also be applied to 1 process to enable parallel execution on a multiprocessing system.
+Advantages:
+ - responsiveness: allows a process to respond to input even while executing tasks in the background.
+ - faster execution on machines with multiple CPUs due to parallel execution.
+ - lower resource consumption: can serve multiple clients concurrently using multiple threads, which uses fewer resources than running multiple processes.
+ - better system utilization: for example, 2 threads withing 1 process accessing different areas of storage (one disk, one memory) in parallel.
+ - simplified sharing & communication: unlike processes, threads within a process can communicate easily.
+Disadvantages:
+ - synchronization: race conditions, deadlocks, livelocks.
+ - trying to perform an illegal operation in a thread can crash the entire process. 
+
+-=- Scheduling
+ - Preemptive Scheduling: common on multi-user machines for its finer greained control over execution time via context switching. However, may result in context switches at unanticipated moments.
+ - Cooperative scheduling: requires the thread to relinquish control of execution, thus ensuring that threads run to completion. Can create problems if a thread blocks while waiting on a resource.

@@ -12,6 +12,7 @@ type AdjListVertex struct {
 	Key    float64        // used in prim's MST algo to manage the min-heap
 	Index  int            // used in prim's MST algo to manage the min-heap (to provide index for DecreaseKeys method)
 	Weight float64        // used by Topological Sort method in DAG-SHORTEST-PATHS algo
+	H      float64        // used in Johnsons's algo for computing all-pairs shortest-paths
 }
 
 // CreateAdjListVertex : creates a new Vertex

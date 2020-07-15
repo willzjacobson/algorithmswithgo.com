@@ -40,3 +40,50 @@ Disadvantages:
 -=- Scheduling
  - Preemptive Scheduling: common on multi-user machines for its finer greained control over execution time via context switching. However, may result in context switches at unanticipated moments.
  - Cooperative scheduling: requires the thread to relinquish control of execution, thus ensuring that threads run to completion. Can create problems if a thread blocks while waiting on a resource.
+
+-=- Lock
+A synchronization mechanism for enforcing limits on access to a resource in an environment where there are many threads of execution. A lock is designed to enforce a "mutual exclusion concurrency control" policy.
+Generally, locks are "advisory locks", where each thread cooperates by acquiring the lock before accessing the corresponding data. 
+Some systems also implement "mandatory locks", where attempting unauthorized access to a locked resource will force an exception in the entity attempting to make the access.
+
+Lock Types
+The simplest type of lock is a "semaphore", which provides exlcusive access to the locked data. Other schemes provide shared access for reading data. Other modes include "exclusive", "intend-to-exlcude", and "intend-to-upgrade".
+Another way to classify locks is by what happens when the lock strategy prevents progress of a thread. Most locking designs clock the execution of a thread requesting the lock until it is allowed to access the locked resource (for example, within a "spinlock", the thread simply waits until the lock becomes available). This is efficient if threads are blocked for a short time as it avoids the overhead of rescheduling, but is inefficient for long lock times. 
+
+Locks typically require hardware support for efficient implementation. This support usually takes the form of one or more atomic instructions such as "test-and-set", "fetch-and-add" or "compare-and-swap". These instructions allow a single process to test if the lock is free, and if free, acquire the lock in a single atomic operation.
+An atomic operation is required because of concurrency, where more than 1 process executes the same logic. For example:
+  if (lock == 0) {
+    lock = myPID;
+  }
+The above code does not guarantee that the task has the lock, since >1 tasks may be testing the lock simultaneously.
+Careless use of locks can result in livelock or deadlock. To avoid these, the most common strategy is to standardize the lock aquisition sequences so that combinations of inter-dependent locks are always acquired in a specifically defined "cascade" order.
+
+Lock Granularity
+Concepts:
+ - lock overhead: the extra CPI and memory space required for managing locks
+ - lock contention: occurs when one process or thread attempts to acquire a lock heldd by another process of thread.
+There's a tradeoff between keeping lock overhead and lock contention low when choosing how many locks to use in synchronization.
+Granularity is the amount of data protected by a lock. High granularity -> low overhead but high contention, since the courser the lock, the more likelihood it will block an unrelated process. 
+Granular locks, where each process must hold multiple locks from a common set can potentially cause deadlock.
+
+-=- Mutex (from "mutual exclusion") (seems to be used synonymously with "lock")
+Mutual exclusion is a property of concurrency control, used to prevent race conditions.
+It is the requirement that 1 thread of execution never enters its critical section (the interval of time during which it accesses a shared resource, such as shared memory) at the same time that another concurrent thread enters its own critical section. 
+Must be implemented in such a way as to not cause deadlocks.
+A common implementation is called "busy-waiting". This uses shared memory and an atomic "test-and-set" instruction. A process can "test-and-set" on a location in shared memory, and since the operation is atomic, only one process can set the flag at a time. Any process that is unsuccessful in setting the flag can either go on to do other tasks and try again later, release the processor to another process and try again later, or continue to loop while checking the flag until it is successful in acquiring it.
+
+Deadlock
+The situation when each of >= 2 tasks is waiting for a lock that the other task holds (stuck forever).
+Can only occur if all the following conditions hold simultaneously:
+ - mutual exclusion: at least 1 resource must be held in a non-sharable mode. Only 1 process/thread can use the resource at any given time.
+ - "hold and wait" or "resource holding": a process is currently holding 1 resource and requesting additional resource(s) being held by other processes/threads.
+ - no preemtion*: a resource can be released only voluntarily by the process holding it.
+ - circular wait: each task must be waiting for a resource that is being held by another task, which is in turn waiting for the first task to release the resource it is holding.
+
+*preemtion is the act of temporarily interrupting a task without requiring its cooperation, and with the intent of resuming the task later. Such interruptions are known as context switches, and are normally carried out by a privileged task of part of the system known as a "preemptive scheduler".
+
+Livelock
+- Similar to deadlock, except the processes involved constantly change with regard to one another, none progressing.
+Example: 2 people meet in a corridor, and keep moving side-to-side to try to make room for the other.
+- Can occur when we try to avoid deadlock using asynchronous locking, where multiple threads compete for the same set lock(s), avoid acquiring them to allow other threads to take the lock first, and never actually get to proceed. This causes resource starvation and gets nothing done.
+- Livelock is a risk with some algorithms that detect and recover from deadlock. If >1 process takes action, the deadlock detection algorithm can be repeatedly retriggered. This can be avoided by ensuring that only 1 process (chosen arbitrarily or by priority) takes action.

@@ -72,7 +72,7 @@ It is the requirement that 1 thread of execution never enters its critical secti
 Must be implemented in such a way as to not cause deadlocks.
 A common implementation is called "busy-waiting". This uses shared memory and an atomic "test-and-set" instruction. A process can "test-and-set" on a location in shared memory, and since the operation is atomic, only one process can set the flag at a time. Any process that is unsuccessful in setting the flag can either go on to do other tasks and try again later, release the processor to another process and try again later, or continue to loop while checking the flag until it is successful in acquiring it.
 
-Deadlock
+-=- Deadlock
 The situation when each of >= 2 tasks is waiting for a lock that the other task holds (stuck forever).
 Can only occur if all the following conditions hold simultaneously:
  - mutual exclusion: at least 1 resource must be held in a non-sharable mode. Only 1 process/thread can use the resource at any given time.
@@ -82,8 +82,34 @@ Can only occur if all the following conditions hold simultaneously:
 
 *preemtion is the act of temporarily interrupting a task without requiring its cooperation, and with the intent of resuming the task later. Such interruptions are known as context switches, and are normally carried out by a privileged task of part of the system known as a "preemptive scheduler".
 
-Livelock
+-=- Livelock
 - Similar to deadlock, except the processes involved constantly change with regard to one another, none progressing.
 Example: 2 people meet in a corridor, and keep moving side-to-side to try to make room for the other.
 - Can occur when we try to avoid deadlock using asynchronous locking, where multiple threads compete for the same set lock(s), avoid acquiring them to allow other threads to take the lock first, and never actually get to proceed. This causes resource starvation and gets nothing done.
 - Livelock is a risk with some algorithms that detect and recover from deadlock. If >1 process takes action, the deadlock detection algorithm can be repeatedly retriggered. This can be avoided by ensuring that only 1 process (chosen arbitrarily or by priority) takes action.
+
+-=- Semaphores
+Variable or abstract data type used to control access to a common resource by multiple processes on a concurrent system. 
+2 types:
+ 1) counting semaphore: records how many units of a particlular resource are available (for example, messages or free spaces in a queue). Counting queues come with operations P (decrements the count) and V (increments the count). It is crucial that P and V are atomic. This can be accomplished either via a built-in machine instruction, or using a "mutual exclusion algorithm" in the code.
+ 2) binary semaphores are restricted to the values 0 and 1 (locked/unlocked).
+A semaphore is coupled with operations to adjust the record safely (avoiding race conditions) as unite become free or are acquired, and if necessary, to wait until a unit becomes available.
+Semaphore count may serve as a trigger for a number of different actions. For example, shutting off lights when nobody is in a room.
+If a process does any of these things, the semaphore will not work as desired:
+ - request a resource and forget to release it
+ - release a resource that was never requested
+ - holding a resource for a long time without needing it
+ - using a resource without requesting it (or after releasing it)
+Even if rules are followed, multi-resource deadlock may still occur when there are different resources managed by different semaphores and when processes require multiple resources simultaneously.
+Example of using a counting semaphore is a queue implementation with producer and consumers. The queue has a max length of n. 3 semaphores are required: 
+    - fullCount: used by consumers so they know when they can extract a message (<= the number of messages in queue)
+    - emptyCount: used by producers so they know when they can add a message (<= the number of empty spaces, used by producers)
+    - useQueue: says whether or not the queue is locked. 
+
+Semaphores vs Mutexes:
+A mutex is like a binary semaphore, but the difference is in how they are used. A true mutex can only be unlocked by the task that locked it. This constraint aims to handle some potential problems with semaphores:
+ - priority inversion: if the mute knows who locked it (and this is supposed to unlock it), it's possible to promote the priority of that task whenever a higher pri task comes along.
+ - termination deadlock: the OS can release the mutex if the task prematurely terminates.
+ - an error can be raised on release of the mutex if the releasing task is not the owner.
+
+-=- Monitors

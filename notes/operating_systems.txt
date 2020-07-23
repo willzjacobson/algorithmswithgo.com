@@ -1,22 +1,31 @@
--=- Process
-The instance of a computer program that is being executed by one or many threads.
-Contains the program code and its activity.
-May be made up of multiple threads of execution that execute instructions concurrently.
-While a program is a passive collection of instructions, a process is the actual execution of those instructions.
+Concurrency: Having multiple tasks that can be worked on at the same time, but not necessarily working on them at the same time. For example, a grocery list. Concurrency is a prerequisite for parallel execution, since you need tasks that can be done simultaneously.
+Parallelism: The ability to actually work on those concurrent tasks at the same time. For example, you and your friends splitting up to grab everything on the grocery list.
 
+-=- Process
+The instance of a computer program that is being executed by one or many threads that execute instructions concurrently. 
+To be run, a program is compiled down to binary (the only form of instruction the CPU understands), and is loaded into memory along with resources it needs to run as a process:
+ - registers: places that are part of the CPU where data is held. Registers can hold an instruction, storage address, or other data needed by the process.
+ - a program counter/instruction pointer: keeps track of where a computer is in its program sequence.
+ - a stack: data structure that stores information about the active subroutines of a program, and is used as a scratch space for a process.
+ - heap: dynamically allocated memory for the process (different from the stack).
+
+Each process has a separate memory address space, which makes it isolated from other processes. 
 "Multitasking" allows processes to share processors (CPUs) and other system resources.
 While each CPU (core) executes a single task at a time, multitasking allows each processor to switch between tasks that are being executed without having to wait for each task to finish.
 
 -=- Thread (of execution)
 The smallest instance of programmed instructions that can be managed independently by a scheduler, which is typically part of an OS.
-On most OS's, a thread is a component of a process.
+On most OS's, a thread is a component of (and a unit of execution within) a process.
 Multiple threads can exits within 1 process, executing concurrently and sharing resources such as memory, while different processes do not share these resources.
 In particular, threads of a process share its executable code and the values of its dynamically allocated variables and non-thread-local variables at any given time.
+ - Each thread has its own memory and execution stack (so do goroutines), but share the heap allocated to the process. 
+ - A thread usually have ~1Mb allocated to it (goroutines have a variable stack space that starts at ~2kb, and can grow from there. More efficient memory usage).
+ - Threads are managed by the OS (goroutines are managed by the Go runtime - under the hood, it schedules those goroutines onto threads. Typically there are more goroutines than threads. There can be hundreds of thousands of goroutines active at the same time, but not that many threads).
 
 Threads vs processes
  - processes are typically independent, whereas threads exist as subsets of a process
- - processes cary more state than threads, whereas multiple threads within a process share process state as well as memory & other resources.
- - processes have separate adress spaces, whereas threads share the same adress space.
+ - processes cary more state than threads, whereas multiple threads within a process share process state as well as memory (heap) & other resources.
+ - processes have separate adress spaces, whereas threads share the same adress space of their process.
  - processes only interact through system-provided inter-process communication mechanisms.
  - context switching between threads is typically faster than context switching between processes.
 
@@ -31,13 +40,38 @@ Advantages:
  - responsiveness: allows a process to respond to input even while executing tasks in the background.
  - faster execution on machines with multiple CPUs due to parallel execution.
  - lower resource consumption: can serve multiple clients concurrently using multiple threads, which uses fewer resources than running multiple processes.
- - better system utilization: for example, 2 threads withing 1 process accessing different areas of storage (one disk, one memory) in parallel.
+ - better system utilization: for example, 2 threads within 1 process accessing different areas of storage (one disk, one memory) in parallel.
  - simplified sharing & communication: unlike processes, threads within a process can communicate easily.
 Disadvantages:
  - synchronization: race conditions, deadlocks, livelocks.
  - trying to perform an illegal operation in a thread can crash the entire process. 
 
+Context Switching
+The process of storing the state of a process or thread, so that it can be resumed later. This allows multiple processes to share a single CPU.
+A context switch can also happen at the time of an interrupt, like when a task needs to access disk storage, freeing up CPU time for other tasks.
+Computationally expensive. Saving and loading registers and memory maps. Switching between threads is faster, because threads share the same virtual memory maps. 
+Some processors have hardware support for context-switching, which sounds faster, but windows and linux do not use this feature due to complications.
+3 potential triggers for a context switch:
+  1) Multitasking: one process being switched out of the CPU so another can run. This can be triggered by:
+    - a process making itself unrunnable, such as when waiting for an I/O or synchronization operation to complete.
+    - a preemptive scheduler triggering a timer interrupt when a process exceeds its time slice.
+  2) Interrup handling: if the CPU requests data from disk or an HTTP request (for example), rather than busy-waiting until a response is received, it can issue the request and continue on with some other execution. When the data is fetched, the CPU can be interrupted and presented with the data, so the initial process or thread can continue.
+  3) User and kernel mode switching. This only requires a context switch on some OS's.
+Steps:
+ - State of the current process must be stored, so it can be resumed. Process state includes any registers it is using, memory heaps, the program counter, and other OS-specific data. This process state is stored in a data structre called "process control block" (PCB), which is stored on a per-process stack in kernel memory.
+ - A handle to the PCB is added to the queue of processes that are ready to run (the "ready queue").
+ - The OS can then select another process from the ready queue and restore its PCB. Process and thread priority can influence which process is chosen from the ready queue.
+
 -=- Scheduling
+The method by which work is assigned to resources that complete the work.
+Schedulers are generally implemented so they keep all resources busy. 
+Scheduling makes it possible to have multitasking with a single CPU.
+A scheduler may have multiple priorities, some of which sometimes conflict:
+ - maximize throughput (total work done per time unit)
+ - minimize wait time (time between a task being ready and execution beginning)
+ - minimize latency (time between a task being ready and being complete)
+ - maximize fairness (CPU time given to each process)
+2 Types of process schedulers:
  - Preemptive Scheduling: common on multi-user machines for its finer greained control over execution time via context switching. However, may result in context switches at unanticipated moments.
  - Cooperative scheduling: requires the thread to relinquish control of execution, thus ensuring that threads run to completion. Can create problems if a thread blocks while waiting on a resource.
 
@@ -60,10 +94,10 @@ Careless use of locks can result in livelock or deadlock. To avoid these, the mo
 
 Lock Granularity
 Concepts:
- - lock overhead: the extra CPI and memory space required for managing locks
- - lock contention: occurs when one process or thread attempts to acquire a lock heldd by another process of thread.
+ - lock overhead: the extra CPU and memory space required for managing locks
+ - lock contention: occurs when one process or thread attempts to acquire a lock held by another process of thread.
 There's a tradeoff between keeping lock overhead and lock contention low when choosing how many locks to use in synchronization.
-Granularity is the amount of data protected by a lock. High granularity -> low overhead but high contention, since the courser the lock, the more likelihood it will block an unrelated process. 
+Granularity is the amount of data protected by a lock. Low granularity -> low overhead but high contention, since the courser the lock, the more likelihood it will block an unrelated process. 
 Granular locks, where each process must hold multiple locks from a common set can potentially cause deadlock.
 
 -=- Mutex (from "mutual exclusion") (seems to be used synonymously with "lock")
@@ -93,8 +127,13 @@ Variable or abstract data type used to control access to a common resource by mu
 2 types:
  1) counting semaphore: records how many units of a particlular resource are available (for example, messages or free spaces in a queue). Counting queues come with operations P (decrements the count) and V (increments the count). It is crucial that P and V are atomic. This can be accomplished either via a built-in machine instruction, or using a "mutual exclusion algorithm" in the code.
  2) binary semaphores are restricted to the values 0 and 1 (locked/unlocked).
-A semaphore is coupled with operations to adjust the record safely (avoiding race conditions) as unite become free or are acquired, and if necessary, to wait until a unit becomes available.
+A semaphore is coupled with operations to adjust the record safely (avoiding race conditions) as units become free or are acquired, and if necessary, to wait until a unit becomes available.
+Counting Semaphore Methods:
+ - Wait (P): decrements the value of the semaphore variable by 1. If the new value is negative, the process/thread is blocked, and added to the semaphore's queue. Otherwise it continues, having used a unit of the resource.
+ - Signal (V): Incrememnts the value of the semaphore by 1. If the pre-increment value was negative - meaning there are processes/threads waiting for a resource - it transfers a one from the semaphore's waiting queue to the ready queue.
 Semaphore count may serve as a trigger for a number of different actions. For example, shutting off lights when nobody is in a room.
+Many OS's provide efficient semaphore primitives to block/unblock processes, so they don't waste resources checking the semaphore's value.
+
 If a process does any of these things, the semaphore will not work as desired:
  - request a resource and forget to release it
  - release a resource that was never requested
@@ -108,8 +147,59 @@ Example of using a counting semaphore is a queue implementation with producer an
 
 Semaphores vs Mutexes:
 A mutex is like a binary semaphore, but the difference is in how they are used. A true mutex can only be unlocked by the task that locked it. This constraint aims to handle some potential problems with semaphores:
- - priority inversion: if the mute knows who locked it (and this is supposed to unlock it), it's possible to promote the priority of that task whenever a higher pri task comes along.
+ - priority inversion: if the mutex knows who locked it (and thus is supposed to unlock it), it's possible to promote the priority of that task whenever a higher pri task comes along.
  - termination deadlock: the OS can release the mutex if the task prematurely terminates.
  - an error can be raised on release of the mutex if the releasing task is not the owner.
 
 -=- Monitors
+A monitor is a synchronization construct that allows threads to have both mutual exclusion, and the ability to wait (block) for a certain condition to become false.
+ - A monitor consists of a mutex (lock) object, and "condition variables". A condition variable is basically a container of threads that are all waiting for a certain condition. 
+ - We often have a one-to-many relationship between mutexes and condition variables. That is, condition variables often use the same mutex (for example, queueEmpty and queueFull condition variables using the same queueLock). But a single condition variable won't use multiple mutexes.
+ - Using mutexes and condition variables, monitors provide a way for a thread to give up exlcusive access (the mutex) in order to wait for some condition to be met, then regain access and resume its task. All without wasting CPU resources by busy-waiting.
+ - Locks and condition variables can be derived from semaphores. Thus, monitors and semaphores are reducible to one another.
+ - Another definition of "monitor" could be a threadsafe class that wraps around a mutex to safely allow access to a method or variable by >1 thread.
+
+Condition variables
+While a thread is waiting on a condition variable, that thread does not hold the mutex (occupy the monitor), and thus other threads can enter the monitor and change its state.
+3 operations supported by condition variables:
+ - WAIT(c, m) where c is the condition variable Pc and m is the mutex associated with the monitor. Does the following:
+  Atomically:
+    a) release the mutex (was just previously acquired)
+    b) move this thread from 'running' to c's wait queue.
+    c) sleep this thread (context is yielded to another thread). (This thread is then subsequently notified/signalled and resumed later, at which point it automatically reacquires the mutex)
+    The atomicity of these opreations is important to avoid race conditions that would be caused by a preemptive thread switch in-between them. For example: if another thread calls "signal" before this thread goes to sleep, this thread will then go to sleep and never wake up.
+ - SIGNAL(c): indicate that Pc is now true, and moves one or more threads in c's "sleep queue" to a "ready queue" for execution. 
+ - BROADCAST(c) wakes up all threads in c's wait queue.
+
+Example of a simple queue with Producer and Consumer threads:
+// create global vars
+RingBuffer queue // thread-unsafe ring-buffer of tasks
+Lock queueLock // mutex for the queue
+CV queueEmptyCV  // condition var for consumer threads waiting for the queue to be non-empty. Associated lock is queueLock.
+CV queueFullCV  // condition var for producer threads waiting for the queue to be non-full. Associated lock is also queueLock.
+
+// Method representing each producer thread's behavior:
+Producer() {
+  while (true) { // infinite loop to signify an ever-running thread
+    task myTask = ...' // create new task
+    queueLock.acquire(); // aquire lock for conditional predicate check
+    while (queue.isFull()) {  // do not proceed past this loop unless queue is not full
+      // make threading system automatically release queueLock
+      // enqueue thread into queueFullCV, then sleep thread.
+      wait(queueLock, queueFullCV);
+      // "wait" automatically reacquires queueLock when "signal" is called by a Consumer thread,
+      // at which point we re-check the predicate condition (the queue being full)
+    }
+    // Critical section that requires the queue to be non-full. We are holding queueLock.
+    queue.enqueue(myTask); // Add the task to the queue.
+
+    // Now the queue is guaranteed to be non-empty, so signal a consumer thread
+    // or all consumer threads that might be blocked waiting for the queue to be non-empty:
+    signal(queueEmptyCV); -- OR -- notifyAll(queueEmptyCV);
+
+    // End of critical sections related to the queue.
+    queueLock.release(); // Drop the queue lock until we need it again to add the next task.
+  }
+}
+
+"Consumer" implementation is symmetric to "Producer".

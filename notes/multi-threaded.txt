@@ -50,10 +50,23 @@ When 2 subcomputations are joined in series, the work of the composition is the 
  - On an ideal parallel computer with P processors, a "greedy scheduler" executes a multithreaded computation with work T1 and span T∞ in time:
     Tp <= T1/P + T∞.
    An optimization for a computation with x processors can actually slow the computation for y processors. Thus, work and span sometimes provide a better means of extrapolating performance than measured running times.
- 
 
 Scheduling
-The sceduler maps the strands to static threads, and the operating system schedules the threads on the processors themselves.
+ - The scheduler maps the strands to static threads, and the operating system schedules the threads on the processors themselves.
+ - A multithreaded scheduler has no advance notice of when strands will be spawned and when they will complete. Thus, it operates "on-line".
+ - "Greedy schedulers" assign as many strands to processors as possible in each time step. 
+ - If >=P strands are ready to execute in a given time step, then any P strands are assigned to each of the P processors. We call that a "complete step". An "incomplete step" is when <P strands are ready to execute.
+Performance:
+  - From the Work Law, the best running time we can hope for on P processors is Tp = T1/P.
+  - From the Span Law, the best we can hope for is TP = T∞.
+  - In fact, a greedy sceduler achieves the sum of these two lower bounds as an upper bound.
+    That is, on an ideal parallel computer with P processors, a greedy scheduler executes a multithreaded computation with work T1 and span T∞ in time 
+    Tp <= T1/P + T∞. (proof not included)
+  - The running time Tp of any multithreaded computation scheduled by a greedy scheduler on an ideal parallel computer with P processors is within a factor of 2 of optimal. (proof not included)
+  - A greedy scheduler achieves near-perfect linear speedup on any multithreaded computation as the slackness grows. (proof not included)
+
+
+
 
 -=- Parallel Loops
 Many algorithms contain loops all of whose iterations can operate in parallel. 

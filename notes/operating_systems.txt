@@ -16,10 +16,10 @@ While each CPU (core) executes a single task at a time, multitasking allows each
 -=- Thread (of execution)
 The smallest instance of programmed instructions that can be managed independently by a scheduler, which is typically part of an OS.
 On most OS's, a thread is a component of (and a unit of execution within) a process.
-Multiple threads can exits within 1 process, executing concurrently and sharing resources such as memory, while different processes do not share these resources.
+Multiple threads can exist within 1 process, executing concurrently and sharing resources such as memory, while different processes do not share these resources.
 In particular, threads of a process share its executable code and the values of its dynamically allocated variables and non-thread-local variables at any given time.
  - Each thread has its own memory and execution stack (so do goroutines), but share the heap allocated to the process. 
- - A thread usually have ~1Mb allocated to it (goroutines have a variable stack space that starts at ~2kb, and can grow from there. More efficient memory usage).
+ - A thread usually has ~1Mb allocated to it (goroutines have a variable stack space that starts at ~2kb, and can grow from there. More efficient memory usage).
  - Threads are managed by the OS (goroutines are managed by the Go runtime - under the hood, it schedules those goroutines onto threads. Typically there are more goroutines than threads. There can be hundreds of thousands of goroutines active at the same time, but not that many threads).
 
 Threads vs processes
@@ -48,7 +48,6 @@ Disadvantages:
 
 Context Switching
 The process of storing the state of a process or thread, so that it can be resumed later. This allows multiple processes to share a single CPU.
-A context switch can also happen at the time of an interrupt, like when a task needs to access disk storage, freeing up CPU time for other tasks.
 Computationally expensive. Saving and loading registers and memory maps. Switching between threads is faster, because threads share the same virtual memory maps. 
 Some processors have hardware support for context-switching, which sounds faster, but windows and linux do not use this feature due to complications.
 3 potential triggers for a context switch:
@@ -58,7 +57,7 @@ Some processors have hardware support for context-switching, which sounds faster
   2) Interrup handling: if the CPU requests data from disk or an HTTP request (for example), rather than busy-waiting until a response is received, it can issue the request and continue on with some other execution. When the data is fetched, the CPU can be interrupted and presented with the data, so the initial process or thread can continue.
   3) User and kernel mode switching. This only requires a context switch on some OS's.
 Steps:
- - State of the current process must be stored, so it can be resumed. Process state includes any registers it is using, memory heaps, the program counter, and other OS-specific data. This process state is stored in a data structre called "process control block" (PCB), which is stored on a per-process stack in kernel memory.
+ - State of the current process must be stored, so it can be resumed. Process state includes any registers it is using, memory heaps, the program counter, and other OS-specific data. This process state is stored in a data structure called "process control block" (PCB), which is stored on a per-process stack in kernel memory.
  - A handle to the PCB is added to the queue of processes that are ready to run (the "ready queue").
  - The OS can then select another process from the ready queue and restore its PCB. Process and thread priority can influence which process is chosen from the ready queue.
 
@@ -72,7 +71,7 @@ A scheduler may have multiple priorities, some of which sometimes conflict:
  - minimize latency (time between a task being ready and being complete)
  - maximize fairness (CPU time given to each process)
 2 Types of process schedulers:
- - Preemptive Scheduling: common on multi-user machines for its finer greained control over execution time via context switching. However, may result in context switches at unanticipated moments.
+ - Preemptive Scheduling: common on multi-user machines for its finer grained control over execution time via context switching. However, may result in context switches at unanticipated moments.
  - Cooperative scheduling: requires the thread to relinquish control of execution, thus ensuring that threads run to completion. Can create problems if a thread blocks while waiting on a resource.
 
 -=- Lock
@@ -82,7 +81,7 @@ Some systems also implement "mandatory locks", where attempting unauthorized acc
 
 Lock Types
 The simplest type of lock is a "semaphore", which provides exlcusive access to the locked data. Other schemes provide shared access for reading data. Other modes include "exclusive", "intend-to-exlcude", and "intend-to-upgrade".
-Another way to classify locks is by what happens when the lock strategy prevents progress of a thread. Most locking designs clock the execution of a thread requesting the lock until it is allowed to access the locked resource (for example, within a "spinlock", the thread simply waits until the lock becomes available). This is efficient if threads are blocked for a short time as it avoids the overhead of rescheduling, but is inefficient for long lock times. 
+Another way to classify locks is by what happens when the lock strategy prevents progress of a thread. Most locking designs block the execution of a thread requesting the lock until it is allowed to access the locked resource (for example, within a "spinlock", the thread simply waits until the lock becomes available). This is efficient if threads are blocked for a short time as it avoids the overhead of rescheduling, but is inefficient for long lock times. 
 
 Locks typically require hardware support for efficient implementation. This support usually takes the form of one or more atomic instructions such as "test-and-set", "fetch-and-add" or "compare-and-swap". These instructions allow a single process to test if the lock is free, and if free, acquire the lock in a single atomic operation.
 An atomic operation is required because of concurrency, where more than 1 process executes the same logic. For example:
@@ -105,6 +104,10 @@ Mutual exclusion is a property of concurrency control, used to prevent race cond
 It is the requirement that 1 thread of execution never enters its critical section (the interval of time during which it accesses a shared resource, such as shared memory) at the same time that another concurrent thread enters its own critical section. 
 Must be implemented in such a way as to not cause deadlocks.
 A common implementation is called "busy-waiting". This uses shared memory and an atomic "test-and-set" instruction. A process can "test-and-set" on a location in shared memory, and since the operation is atomic, only one process can set the flag at a time. Any process that is unsuccessful in setting the flag can either go on to do other tasks and try again later, release the processor to another process and try again later, or continue to loop while checking the flag until it is successful in acquiring it.
+
+Mutex vs generic "Lock"
+ - A lock allows only one thread to enter the part that's locked and the lock is not shared with any other processes.
+ - A mutex is the same as a lock but it can be system wide (shared by multiple processes).
 
 -=- Deadlock
 The situation when each of >= 2 tasks is waiting for a lock that the other task holds (stuck forever).
@@ -130,7 +133,7 @@ Variable or abstract data type used to control access to a common resource by mu
 A semaphore is coupled with operations to adjust the record safely (avoiding race conditions) as units become free or are acquired, and if necessary, to wait until a unit becomes available.
 Counting Semaphore Methods:
  - Wait (P): decrements the value of the semaphore variable by 1. If the new value is negative, the process/thread is blocked, and added to the semaphore's queue. Otherwise it continues, having used a unit of the resource.
- - Signal (V): Incrememnts the value of the semaphore by 1. If the pre-increment value was negative - meaning there are processes/threads waiting for a resource - it transfers a one from the semaphore's waiting queue to the ready queue.
+ - Signal (V): Incrememnts the value of the semaphore by 1. If the pre-increment value was negative - meaning there are processes/threads waiting for a resource - it transfers a thread from the semaphore's waiting queue to the ready queue.
 Semaphore count may serve as a trigger for a number of different actions. For example, shutting off lights when nobody is in a room.
 Many OS's provide efficient semaphore primitives to block/unblock processes, so they don't waste resources checking the semaphore's value.
 

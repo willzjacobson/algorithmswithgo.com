@@ -1,5 +1,5 @@
 Priority Queues
-Max prioriy queues are implemented with max heaps, max prioriy queues with min heaps (see implementation of heap sort for what that is).
+Max prioriy queues are implemented with max heaps, min prioriy queues with min heaps (see implementation of heap sort for what that is).
 Useful for things such as scheduling jobs.
 A priority queue is a data structure for maintaining a set S of elements, each with an associated value called a key.
 A max-priority queue supports the following operations:
@@ -26,7 +26,7 @@ ENQUEUE (insert)
 DEQUEUE (delete)
 
 Linked List
-Contains objects that are arranged in linear order, which is maintained by pionters in each object.
+Contains objects that are arranged in linear order, which is maintained by pointers in each object.
 In a "doubly linked list", each object contains a pointer to the next and previous objects. "Singly linked" lists have no "prev" pointer.
 Lists can be sorted, unsorted, or circular (tail points to head and vice versa)
 LIST-SEARCH(x) operation runs in O(n) time, and returns a pointer to an object
@@ -63,9 +63,9 @@ DIRECT-ADDRESS-DELETE(T,x)
 -=-=- Hash Tables
 If the universe of possible keys is large, storing them in a direct address table (a map or array) may be impractical. And if not all of the keys are actually stored in the data structure, allocating a free slot for each could waste space. 
 With direct addressing, an element with key k is stored in slot k. With hashing, this element is stored in slot h(k), where h is a "hash function". h maps the universe of possible keys U into the slots of a hash table T[0...m-1], where m (the size of the hash table) is typically much smaller than U.
-We say "an element with k k hashes to slot h(k)", and "h(k) is the hash value of key k".
+We say "an element with key k hashes to slot h(k)", and "h(k) is the hash value of key k".
 Collisions
-We call it a "collision" when multiple keys hash to the same slot. We handle this by placing a linked list in each slot. The dictionary oprtations are thus:
+We call it a "collision" when multiple keys hash to the same slot. We handle this by placing a linked list in each slot. The dictionary operations are thus:
 CHAINED-HASH-INSERT(T,x) (worst case O(1))
   insert x at the head of list T[h(x.key)]
 CHAINED-HASH-SEARCH(T,k) (worst case O(n), avg case O(1))
@@ -81,7 +81,7 @@ Since a = n/m and we grow m proprtionally with n, these operations are effective
 -=-=- Hash Functions
 A good hashing function approxiately satisfies the assumption of "simple uniform hashing": each key is equally likely to hash to any of the m slots, idependently of where any other key has hashed to. 
 Sometimes we actually want keys that are close to yield hash values that are far apart (for ex, when using "linear probing"). "Universal hashing" accomplishes this.
-We often represnt keys as naturan numbers. For example, if the key is a string, we represent it in a suitable radix notation. For example, if the key is "pt", we can interpret it as a pair of decimal integers (112, 116), since in ASCII, p=112 and t=116. Then, expressed as a radix integer, the key "pt" becomes 112*128 + 116 = 11452.
+We often represent keys as natural numbers. For example, if the key is a string, we represent it in a suitable radix notation. For example, if the key is "pt", we can interpret it as a pair of decimal integers (112, 116), since in ASCII, p=112 and t=116. Then, expressed as a radix integer, the key "pt" becomes 112*128 + 116 = 11452.
 -=- The division method
 Divide x.key by m - 1. The remainder is the slot x goes into. Thus, the hash function h(k) = k mod m.
 When using this method, m should not be a power of 2, since if m = 2^p, h(k) is just the p lowest-order bits of k. 
@@ -101,7 +101,7 @@ You can design a universal class of hash functions by generating a set of module
 -=-=- Open addressing
 In open addressing, all elements ocupy the hash table itself. Each table entry contains either an element of the dynamic set or nil, rather than a chain of elements. Thus, with open addressing, a table can "fill up"; load factor cannot be > 1. 
 The advantage of open addressing is that it does not require pointers. The extra memory allows us to have a larger tables. Instead of following pointers, we must compute the sequence of slots to be examined. 
-To perform insertion, we succssively "probe" the table untilwe find an empty slot. The sequence of positions probed depends on the key being inserted. Thus, to determins which slots to probe, we extend the hash function to include the probe number (0,1,...m-1). Every table position is eventually checked, though not necessarily in order.
+To perform insertion, we succssively "probe" the table until we find an empty slot. The sequence of positions probed depends on the key being inserted. Thus, to determine which slots to probe, we extend the hash function to include the probe number (0,1,...m-1). Every table position is eventually checked, though not necessarily in order.
 Operations (implemented as if the key is the entire object):
 -= HASH-INSERT(T,k)
 from i = 0 -> i = m
@@ -118,7 +118,7 @@ repeat
   if T[j] == k
     return j // return index at which the key will be found
   i++
-until T[j] == nul or i == m
+until T[j] == nil or i == m
 return nil
 -= Deletion is difficult, since if we replace an element with nil, the sequence traversed when searching for another element could break. Thus, we use a value other than nil to indicate "deleted". However, this make search times no longer depend on the load factor. That's why chaining is more commonly used when we need deletion functionality. 
 For open addressing to work, we assume "uniform hashing": the probe sequence of each key is equally likely to me any of the m! permitations of {0,1,...,m-1}. This extends "simple uniform hashing" from above to define a hash functin that produces not just a single number, but a sequence of numbers.
@@ -128,7 +128,7 @@ Given an open-address hash table with load factor a = n/m < 1, the expected numb
 Inserting an element into an open-address hash table with load factor a requires at most 1/(1-a) probes on average.
 Given an open-address hash table with load factor a<1, the expected number of probes in a a successful search is at most (1/a)*ln(1/(1-a)). Half full: 1.287 probes. If 90% full, 2.559 searches.
 -=-=- Perfect Hashing
-We call a hashing technique "perfect hashing" if O(1) memory accesses are requierd to perform a search in the work case. This can be done if the set of keys is status (once the keys are stored in the table, they don't change).
+We call a hashing technique "perfect hashing" if O(1) memory accesses are required to perform a search in the work case. This can be done if the set of keys is status (once the keys are stored in the table, they don't change).
 To reate a perfect hashing scheme, we use 2 levels of hashing, with universal hashing at each level: 
   1) The first level is the same as for hashing with chaining: hash the n keys into m slots using hash function h carefully chosen from a family of universal hash functions. 
   2) Intead of making a linked list of the keys hashing to slot j, we use a small secondary hash table with an associated hash function. By choosing the hash functions carefully, we can guarantee there are no collisions in the secondary level. In order to ensure no collisions, the size of the inner hash table must be the square of the number of keys hashing to slot j. This seems like it would require a lot of memory, but it turns out to be only O(n) for the primary hash table and each secondary hash table.

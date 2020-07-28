@@ -1,8 +1,6 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
 /*
 MaxHeap :
@@ -54,7 +52,7 @@ func (h *MaxHeap) AssignList(nums *[]int) {
 	}
 	h.slice = *nums
 	h.size = len(*nums)
-	for i := len(h.slice) / 2; i >= 0; i-- {
+	for i := (len(h.slice) / 2) - 1; i >= 0; i-- {
 		h.SendNodeDown(i)
 	}
 }
@@ -92,32 +90,32 @@ func (h *MaxHeap) IncreaseKeys(i int, increaseTo int) {
 }
 
 func (h *MaxHeap) bringNodeUp(i int) {
-	parentInd := i / 2
+	parentInd := (i - 1) / 2
 	for h.slice[i] > h.slice[parentInd] {
 		h.slice[i], h.slice[parentInd] = h.slice[parentInd], h.slice[i]
 		i = parentInd
-		parentInd = i / 2
+		parentInd = (i - 1) / 2
 	}
 }
 
 func (h *MaxHeap) SendNodeDown(i int) {
 	largestInd := i
 	largest := h.slice[i]
-	leftInd := i * 2
-	rightInd := i*2 + 1
+	leftInd := (i+1)*2 - 1  // accounting for off-by-1 error due to Go starting indices at 0 (if Go started at 1, would be 2i)
+	rightInd := (i + 1) * 2 // accounting for off-by-1 error due to Go starting indices at 0 (if Go started at 1, would be 2i+1)
 
 	if h.size >= leftInd+1 && h.slice[leftInd] > largest {
 		largest = h.slice[leftInd]
 		largestInd = leftInd
 	}
 	if h.size >= rightInd+1 && h.slice[rightInd] > largest {
-		largest = h.slice[leftInd]
+		largest = h.slice[rightInd]
 		largestInd = rightInd
 	}
 
 	if largestInd != i {
 		h.slice[largestInd], h.slice[i] = h.slice[i], h.slice[largestInd]
-		h.SendNodeDown(largestInd)
+		h.SendNodeDown(largestInd) // subtract 1 to pass in true index of slice
 	}
 }
 
@@ -159,6 +157,11 @@ func testHeap() {
 	fmt.Println(heap)
 	heap.IncreaseKeys(5, 12)
 	fmt.Println(heap)
+
+	fmt.Println("-=-=-")
+	heap2 := CreateMaxHeap()
+	heap2.AssignList(&[]int{1, 2, 3, 4, 5, 6, 7})
+	fmt.Println(heap2)
 }
 
 func main() {

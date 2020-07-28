@@ -54,7 +54,7 @@ func (h *MinHeap) AssignList(nums *[]int) {
 	}
 	h.slice = *nums
 	h.size = len(*nums)
-	for i := len(h.slice) / 2; i >= 0; i-- {
+	for i := (len(h.slice) - 1) / 2; i >= 0; i-- {
 		h.SendNodeDown(i)
 	}
 }
@@ -92,26 +92,26 @@ func (h *MinHeap) DecreaseKeys(i int, decreaseTo int) {
 }
 
 func (h *MinHeap) bringNodeUp(i int) {
-	parentInd := i / 2
+	parentInd := (i - 1) / 2
 	for h.slice[i] < h.slice[parentInd] {
 		h.slice[i], h.slice[parentInd] = h.slice[parentInd], h.slice[i]
 		i = parentInd
-		parentInd = i / 2
+		parentInd = (i - 1) / 2
 	}
 }
 
 func (h *MinHeap) SendNodeDown(i int) {
 	smallestInd := i
 	smallest := h.slice[i]
-	leftInd := i * 2
-	rightInd := i*2 + 1
+	leftInd := (i+1)*2 - 1  // accounting for off-by-1 error due to Go starting indices at 0 (if Go started at 1, would be 2i)
+	rightInd := (i + 1) * 2 // accounting for off-by-1 error due to Go starting indices at 0 (if Go started at 1, would be 2i+1)
 
 	if h.size >= leftInd+1 && h.slice[leftInd] < smallest {
 		smallest = h.slice[leftInd]
 		smallestInd = leftInd
 	}
 	if h.size >= rightInd+1 && h.slice[rightInd] < smallest {
-		smallest = h.slice[leftInd]
+		smallest = h.slice[rightInd]
 		smallestInd = rightInd
 	}
 
@@ -159,6 +159,11 @@ func testHeap() {
 	fmt.Println(heap)
 	heap.DecreaseKeys(5, 1)
 	fmt.Println(heap)
+
+	fmt.Println("-=-=-")
+	heap2 := CreateMinHeap()
+	heap2.AssignList(&[]int{7, 6, 5, 4, 3, 2, 1})
+	fmt.Println(heap2)
 }
 
 func main() {

@@ -1,14 +1,14 @@
 -=- Intro
 "Chip microprocessors" now contain a single multi-core integrated circuit chip that houses multiple processing "cores", each of which is a full-fledged processor that can access common memory.
 Parallel computers (computers with multiple processing units) are now common.
-Some parallel computers feature "shared memory", where each processor can directly access any location of memory. Others employ "distributed memory", where each processor'smemory is provate, and an explicit message but be sent for one processor to access the memory of another.
-Now,with the advent of multicore technology, every new laptop & desktop machine is a shared-memory parallel computer. This chapter is about that.
+Some parallel computers feature "shared memory", where each processor can directly access any location of memory. Others employ "distributed memory", where each processor's memory is private, and an explicit message but be sent for one processor to access the memory of another.
+Now, with the advent of multicore technology, every new laptop & desktop machine is a shared-memory parallel computer. This chapter is about that.
 One common means of programming chip multiprocessors (and other shared-memory parallel computers) is by using "static threading", which provides a software abstraction of "virtual processors", or "threads", sharing common memory. Each thread executes code independently of other threads. The OS loads a thread into a processor for execution, then swaps it out for another. These operations are slow, and can be complex for the programmer to manage, particularly to evenly load-balance the work.
 This has led to the creation of "concurrency platforms", which provide a layer of software that coordinates, schedules, and manages parallel-computing resources. Some are built into libraries, and others are full on languages with compiler & runtime support (Node && Go?).
 
 -=- Dynamic multithreaded programming
 "Dynamic multithreading" is an important class of concurrency platform. This is what we adopt in this chapter.
-It allows programmers to specify parallelism in applications without worrying about communicatino protocols, load balancing, etc. The concurrency platform contains a scheduler, which load-balances the computation automatically.
+It allows programmers to specify parallelism in applications without worrying about communication protocols, load balancing, etc. The concurrency platform contains a scheduler, which load-balances the computation automatically.
 Though dynamic-multithreading environments are involving, they generally support:
   1) nested parallelism: allows a subroutine to be "spawned", allowing the caller to proceed while the spawned subroutine is computing its result.
   2) parallel loops: like an ordinary "for" loop, except the iterations can execute concurrently.
@@ -32,24 +32,21 @@ Types of edges in a computation dag:
 A computation starts with a single "initial strand" and ends with a single "final strand".
 
 Performance measures
- - the "work" of a multithreaded computation is the total time to execute the entire computation on one processor. In other words, ths sum of the times taken by each strand. The work is the running time on a single processor: T1.
+ - the "work" of a multithreaded computation is the total time to execute the entire computation on one processor (T1). In other words, the sum of the times taken by each strand.
  - the "span" is the longest time to execute the strands along any path in the dag. If each strand takes unit time, the span is the number of vertices along the longest (critical path). We can find the critical path of a dag in O(V+E) time (from ch. 24). The span is the running time if each strand could be run on its own processor, denoted by T∞.
  - The lower bound of the running time of a multithreaded algo is controlled by the span (which is T∞). 
     For example, for the recursive form of Fib, Fib(n-1) and Fib(n-2) run in parallel, so T∞ = max(T∞(n-1), T∞(n-2))+ O(1) = T∞(n-1)+ O(1).
  - To denote running time of a multithreaded computation of preprocessors, we use Tp.
-Workand span provide lower bounds on Tp.
+Work and span provide lower bounds on Tp.
   Work Law: Tp >= T1/P, since P processors can do at most P units of work at a time.
   Span Law: Tp >= T∞, since you can't do any better than a machine with ∞ processors.
- - The "speedup" is the ration T1/Tp, which says how many times faster the computation is on P processors than on 1. If T1/Tp=P, we have "perfect linear speedup".
+ - The "speedup" is the ratio T1/Tp, which says how many times faster the computation is on P processors than on 1. If T1/Tp=P, we have "perfect linear speedup".
  - The "parallelism" is defined as T1/T∞ (ratio of work to span). We can view parallelism in 3 perspectives:
     - It denotes the average amount of work that can be performed in parallel for each step along the critical path.
     - Gives the maximum possible speedup that can be acheived by any number of processors.
     - Once P exceeds the parallelism, we get deminishing returns by adding more processors.
 When 2 subcomputations are joined in series, the work of the composition is the sum of their work, and the span is the sum of their spans. When 2 subcomputations are joined in parallel, the work of the composition is still the sum of their work, but the span is the maximum between the 2 spans.
  - 10x more parallelism than processors generally suffices to give good speedup.
- - On an ideal parallel computer with P processors, a "greedy scheduler" executes a multithreaded computation with work T1 and span T∞ in time:
-    Tp <= T1/P + T∞.
-   An optimization for a computation with x processors can actually slow the computation for y processors. Thus, work and span sometimes provide a better means of extrapolating performance than measured running times.
 
 Scheduling
  - The scheduler maps the strands to static threads, and the operating system schedules the threads on the processors themselves.
@@ -62,11 +59,9 @@ Performance:
   - In fact, a greedy sceduler achieves the sum of these two lower bounds as an upper bound.
     That is, on an ideal parallel computer with P processors, a greedy scheduler executes a multithreaded computation with work T1 and span T∞ in time 
     Tp <= T1/P + T∞. (proof not included)
+      The dependency on P means that an optimization for a computation with x processors can actually slow the computation for y processors. Thus, work and span sometimes provide a better means of extrapolating performance than measured running times.
   - The running time Tp of any multithreaded computation scheduled by a greedy scheduler on an ideal parallel computer with P processors is within a factor of 2 of optimal. (proof not included)
   - A greedy scheduler achieves near-perfect linear speedup on any multithreaded computation as the slackness grows. (proof not included)
-
-
-
 
 -=- Parallel Loops
 Many algorithms contain loops all of whose iterations can operate in parallel. 
@@ -76,12 +71,12 @@ MAT-VEC(A,x)
   let y be a new vector of length n
   parallel for i=1 to n   // fill new vector y with 0's in parallel
     yi = 0
-  parallel for i=1 to n  // forform each iteration in parallel
+  parallel for i=1 to n  // perform each iteration in parallel
     for new j=1 to n  // "new" means the variable j only lives within this iteration, to preclude race conditions
       yi = yi + aij*xj
   return y
 
-A compiler can implement each parallel for loop as a divide-and-conquer subroutine using nexted parallelism. 
+A compiler can implement each parallel for loop as a divide-and-conquer subroutine using nested parallelism. 
 The 2nd parallel for loop can be implemented by this subroutine:
 MAT-VEC-MAIN-LOOP(A,x,y,n,i,i')
   if i==i'
@@ -91,17 +86,17 @@ MAT-VEC-MAIN-LOOP(A,x,y,n,i,i')
     spawn MAT-VEC-MAIN-LOOP(A,x,y,n,i,mid)  // "spawn" means create a parallel process
     MAT-VEC-MAIN-LOOP(A,x,y,n,mid+1,i')
     sync  // "sync" means wait for child process to complete so can rejoin the main process
-This code recursively spawns the first hald of the iteratins of the loop to execute in parallel with the 2nd half of the iterations.
+This code recursively spawns the first half of the iterations of the loop to execute in parallel with the 2nd half of the iterations.
 This creates a binary tree of execution where the leaves are individual loop iterations. 
 Complexity:
   Work:
   - The work required by MAT-VEC-MAIN-LOOP is O(n^2). This is also the running time if performed serially rather than in parallel.
   - The work of spawning and syncing does add work, but not asymptotically. That's because we do n spawn and sync calls, and managing of the recursive parallel tree is O(lg n). Thus, the running time of the MAT-VEC-MAIN-LOOP is O(n^2), since n^2 > n lg n.
   Span:
-  - We must also account for the overhead of recursive spawning when analyzing the span of a parallel-loop construct. The depth of recursive calling is logarithmic in the number of iterations,so for a parallel loop with n iterations, in which the iteration has a span iter∞(i), the span is:
+  - We must also account for the overhead of recursive spawning when analyzing the span of a parallel-loop construct. The depth of recursive calling is logarithmic in the number of iterations, so for a parallel loop with n iterations, in which the iteration has a span iter∞(i), the span is:
     T∞(n) = O(lg n) + max(iter∞(i)).
-  - The span of the first parallel loop in MAT-VEC is this O(lg n), since each iteration completes in constant time.
-  - The span of the first parallel loop in MAT-VEC is this O(n), since each iteration completes in O(n) time, which dominates the lg n cost of the parallelism.
+    Each loop has running time O(n). Since n > lg n, T∞(n) = O(n).
+  - The parallelism of this solution is work/span = O(n^2)/O(n) = O(n).
 
 -=- Race Conditions
 A multithreaded algo is "deterministic" if it always does the same thing on the same input. Otherwise, it is "nondeterministic".
@@ -126,7 +121,7 @@ P-SQUARE_MATRIX_MULTIPLY(A,B)
   let C be a new nxn matrix
   parallel for i=1 to n
     parallel for j=1 to n
-      cij = new k=1 to n
+      cij = 0
       for new k=1 to n
         cij = cij + aik*bki
   return C
@@ -137,18 +132,18 @@ Parallelism: T1(n)/T∞(n) = O(n^2).
 
 Divide-and-conquer approach
 Strassen's method calculates the product of 2 nxn matrices in O(n^(lg 7) time, but it's pretty complicated. 
-Here's we'll parallelize a divide-and-conquer approach that is O(n^3) (work) serially, but run in O((lg n)*(lg n)) (span) in parallel. 
+Here we'll parallelize a divide-and-conquer approach that is O(n^3) (work) serially, but runs in O((lg n)*(lg n)) (span) in parallel. 
  - We break up each nxn matrix into 4 quadrants (we gloss over the indexing challenges here) and recursively multiply those, then put them back together.
  - All the recursive calls except 1 are run by spawned child processes and thus run in parallel with the main process.
  - The work to break up the matrices is constant, so the span is dominated by the 2 nested parallel calls at the end to recompose the matrices. Thus, the span is O((lg n)*(lg n)). Also written as O(lg^2 n).
 In our implementation, we pass in the matrix to hold the product rather than generate it within.
 
-P-MATRIX-MULTIPLY-RECURSIVE(A,A,B)
+P-MATRIX-MULTIPLY-RECURSIVE(A,B,C)
   n = A.rows
   if n == 1
     c11 = a11*b11
   else let T be a new nxn matrix
-    partition A,B,C and T inro n/2 x n/2 submatrices: A11,A12,A21,A22,B11,B12,B21,B22,C11,C12,C21,C22,T11,T12,T21,T22
+    partition A,B,C and T into n/2 x n/2 submatrices: A11,A12,A21,A22,B11,B12,B21,B22,C11,C12,C21,C22,T11,T12,T21,T22
     spawn P-MATRIX-MULTIPLY-RECURSIVE(C11,A11,B11)
     spawn P-MATRIX-MULTIPLY-RECURSIVE(C12,A11,B12)
     spawn P-MATRIX-MULTIPLY-RECURSIVE(C21,A21,B11)

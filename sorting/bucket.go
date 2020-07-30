@@ -14,11 +14,9 @@ func BucketSort(nums []float32) {
 
 	out := []float32{}
 	b := make([][]float32, len(nums))
-	for i := range b {
-		b[i] = []float32{}
-	}
+
 	for _, v := range nums {
-		listInd := int(v / (1 / float32(len(nums))))
+		listInd := len(nums) * int(v)
 		b[listInd] = append(b[listInd], v)
 	}
 

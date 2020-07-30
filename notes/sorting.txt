@@ -90,7 +90,7 @@ Work by means other than just comparing values
 Thus, the lower bound of nlogn that plagues comparison sorting methods does not apply. 
 
 Counting Sort
-Use case: have n integers to sort, where the integers rangs from 0 to k
+Use case: have n integers to sort, where the integers range from 0 to k
 O(k+n) worst case
 O(k+n) average case 
 Performs the best where k is low compared to n
@@ -109,10 +109,10 @@ Bucket Sort
 Assumes the unput is drawn from a uniform distribution between 0 and 1 (I assume you could normalize data that is of uniform distribution but not between 0 and 1) (this assumption allows it to be fast).
 O(n^2) worst case (basically becomes worst case insertion sort)
 O(n) average case
-Even if the input is not of uniform distribution, bucket sort will still run in linear time if the sum of the quares of the bucket sizes is linear in the total number of elements. 
+Even if the input is not of uniform distribution, bucket sort will still run in linear time if the sum of the squares of the bucket sizes is linear in the total number of elements. 
 Summary:
 Let b[0..n-1] be a new array of empty linked lists
-for i = 1 to n
+for i=0 to n-1
   insert A[i] into list b[n*A[i]]
 for i=0 to n-1
   sort list in b[i] using insertion sort

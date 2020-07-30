@@ -17,14 +17,7 @@ func HeapSortInt(nums *[]int) {
 	h.AssignList(nums)
 
 	for i := len(*nums) - 1; i >= 0; i-- {
-		// Would have loved to have done this in 1 line,
-		// but the 2 slices 'nums' and 'h.Slice' actually point to the same underlying array
-		tmp := h.Slice[0]
-		h.Slice[0] = h.Slice[i]
-		(*nums)[i] = tmp
-
-		h.Size--
-		h.SendNodeDown(0)
+		(*nums)[i] = h.ExtactMax()
 	}
 }
 

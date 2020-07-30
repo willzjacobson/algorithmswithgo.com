@@ -2,7 +2,7 @@ COUNTING
 
 Rule of Sum and Product
 -=-=-=-
-Rule of sums: The number of waus to choose 1 element from 1 of 2 disjoint sets is the sum of the cardinatlities of the sets. That is, if A and B are 2 finite sets with no members in common, then |A u B| = |A|+|B|. For example, each position on a car's license plate is a letter or a digit. The number of posibilities for each position is therefore 26 + 10 = 36. 
+Rule of sums: The number of ways to choose 1 element from 1 of 2 disjoint sets is the sum of the cardinalities of the sets. That is, if A and B are 2 finite sets with no members in common, then |A u B| = |A|+|B|. For example, each position on a car's license plate is a letter or a digit. The number of posibilities for each position is therefore 26 + 10 = 36. 
 -=-=-=-
 Rule of product: The number of ways to choose an ordered pair is the number of ways to choose the first element times the number of ways to choose the second element. That is, if A and B are two finite sets, then |AxB| = |A|*|B|. For example, if an ice cream parlor offers 28 flavors and 4 topppings, the number of possible combinations is 28*4 = 112.
 
@@ -12,7 +12,7 @@ A string over a finite set S is a sequence of elements of S. For example, there 
 A string of length k is a k-string.
 A substring s' of a string s is an ordered sequence of consecutive elements of s.
 -=-=-=-
-A k-substring of a string is a substring of a string of length k. For example, 010 is a 3-subsctrin of 01101001 (the substring begins at position 4).
+A k-substring of a string is a substring of a string of length k. For example, 010 is a 3-substring of 01101001 (the substring begins at position 4).
 -=-=-=-
 There are |S|^k strings of length k. For example, the number of binary k-strings is 2^k. To construct a k-string over an n-set, we have n ways to pick the first element, n ways to pick the 2nd, etc. Thus, n^2 possible strings.
 
@@ -21,8 +21,8 @@ Permutations
 A permutation of a finite set S is an ordered sequence of all the elements of S, with each element appearing exactly once. If S={a, b, c}, then S has 6 permutations: abc,acb,bac,bca,cab,cba.
 There are n! permutations of a set of n elements.
 -=-=-=- 
-A k-permutation of S is an ordered seuqnce of k elements of S, with no element appearing more than once in the sequence (an ordinary permutation is thus an n-permutation over an n-set). The 12 2-permutations of the set {a, b, c, d} are ab, ac, ad, bs, bc, ca, cb, cd, da, db, dc.
-The number of k-mermutations of an n-set is n(n-1)(n-2)...(n-k+1) = n!/(n-k)! since we have n ways to choose the first element, n-1 ways to choose the second, and so on, until we have selected k elements, the last being a selection from the remaining n-1+1 elements.
+A k-permutation of S is an ordered sequence of k elements of S, with no element appearing more than once in the sequence (an ordinary permutation is thus an n-permutation over an n-set). The 12 2-permutations of the set {a, b, c, d} are ab, ac, ad, bs, bc, ca, cb, cd, da, db, dc.
+The number of k-mermutations of an n-set is n(n-1)(n-2)...(n-k+1) = n!/(n-k)! since we have n ways to choose the first element, n-1 ways to choose the second, and so on, until we have selected k elements, the last being a selection from the remaining n-k+1 elements.
 
 Combinations
 a k-combination of an n-set S is simply a k-subset of S. For example, the 4-set {a, b, c, d} has 6 2-combinations: ab,ac,ad,bc,bd,cd.
@@ -39,20 +39,22 @@ PROBABILITY
 
 An event is a subset of sample space S. The event S is called a certain event, and the event 0 is called the null event. We say 2 events A and B are mutually exclusive if A intersection B is 0. By definition, all "elementary" events are mutually exclusive. 
 Axioms of probability:
- - Pr{A} >= 0 for any event An
+ - Pr{A} >= 0 for any event A
  - Pr{S} = 1
- - PR{A U B} = Pr{A} + Pr{B} for any 2 mutually exclusive events A and B.
+ - Pr{A U B} = Pr{A} + Pr{B} for any 2 mutually exclusive events A and B.
  - Pr{S} - Pr{A} = 1 - Pr{A} is the probablility of the "compliment" of A.
  - Pr{A U B} = Pr{A} + Pr{B} - Pr{A n B} <= Pr{A} + Pr{B}.
 Ex. In a coin-flipping example where 2 coins are flipped 4 times, suppose each of the 4 elementary events is a probability 1/4. Then the probability of getting >=1 head is Pr{HH, HT, TH} = Pr{HH} + Pr{HT} + Pr{TH} = 3/4. Alternately, since the probablility of getting strictly <1 head is 1/4, the probability of getting >=1 head is 1 - 1/4 = 3/4.
 
 Discrete Probability Distributions (defined over a finite or countably infinite space)
-If space S is finite and every element s in S has probability 1/|S|, then we have the "uniform probability distribution" on S. Ex: "picking an element of S at random." If we flip a fair coin n times, we have the uniform probability distribution defined on the sample space S = {H,T}^n, a set of size 2^n. We can represent each elementary event in S as a string of length n over the set {H,T}, each string occurring with probability (1/2)^n. The event
-A = {exactly k heads and exactly n-k tails occur} 
+If space S is finite and every element s in S has probability 1/|S|, then we have the "uniform probability distribution" on S. Ex: "picking an element of S at random." 
+If we flip a fair coin n times, we have the uniform probability distribution defined on the sample space S = {H,T}^n, a set of size 2^n. We can represent each elementary event in S as a string of length n over the set {H,T}, each string occurring with probability 1/(2^n). 
+The event
+  A = {exactly k heads and exactly n-k tails occur}
 is a subset of S of size |A| = (n k), since (n k) strings of length n over {H,T} contain exactly k H's. The probability of event A is thus Pr{A} = (n k)/2^n.
 
 Continuous Uniform Probability Distribution
-For any closed interval [c,d] within the space [a,b] such that a <= c <= d <= b, the "continuous uniform probability distribution" defined the probablility of the event [c,d] to be:
+For any closed interval [c,d] within the space [a,b] such that a <= c <= d <= b, the "continuous uniform probability distribution" defines the probablility of the event [c,d] to be:
 Pr{[c,d]} = (d-c)/(b-a). 
 Each point within [a,b] is equally likely, but the probability of each precise point is actually 0. Instead, we refer to events as ranges. 
 

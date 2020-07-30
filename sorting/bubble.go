@@ -6,7 +6,7 @@ import "fmt"
 //
 // Big O: O(N^2), where N is the size of the list
 func BubbleSortInt(list []int) {
-	for sweepsRemaining := len(list) - 1; sweepsRemaining > 0; sweepsRemaining-- {
+	for sweepsRemaining := len(list) - 1; sweepsRemaining > 0; sweepsRemaining-- { // plan for n-1 passes (at most)
 		swapPerformed := false
 		for i := 1; i <= sweepsRemaining; i++ {
 			if list[i] < list[i-1] {

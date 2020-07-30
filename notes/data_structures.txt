@@ -86,7 +86,7 @@ We often represent keys as natural numbers. For example, if the key is a string,
 Divide x.key by m - 1. The remainder is the slot x goes into. Thus, the hash function h(k) = k mod m.
 When using this method, m should not be a power of 2, since if m = 2^p, h(k) is just the p lowest-order bits of k. 
 m = 2^p - 1 when k is a character string interpreted in radix 2^p is also a poor choice, since permuting the chatacters of k won't change h(k).
-A prime not too lcose to an exact power of 2 is often a good choice for m. For example, if n=2000 and 3 is an acceptable load factor, we can choose m=701, because it's prime and near and near 2000/3, but not near any power of 2. h(k) would then be: k mod 701.
+A prime not too close to an exact power of 2 is often a good choice for m. For example, if n=2000 and 3 is an acceptable load factor, we can choose m=701, because it's prime and near and near 2000/3, but not near any power of 2. h(k) would then be: k mod 701.
 -=- The Multiplication method
 h(k) = floor(m * (kA mod 1))
 2 steps:
@@ -96,8 +96,8 @@ Advantage of this method is that m is not crucial. We usually choose m to be som
 A = (sqrt(5) - 1)/2 ~ 0.618 works well.
 -=- Universal hashing
 If a sneaky person controls your set of unique keys, they could fix them such that they all hash to the same slot, and -> O(n) time for search and delete operations. We can avoid this by choosing the hash function randomly. This approach is called universal hashing.
-Let H be a finite collection of hash functions that map universe U of keys into the range {0,1,...m-1}. Such a collection is said to be "universal" if for any hash function h randomly chosen from H, the chance of a collisions between distinct keys is no more than 1/m (the chance of randomly selecting the same slot twice). 
-You can design a universal class of hash functions by generating a set of module-based functions using number theroy.
+Let H be a finite collection of hash functions that map universe U of keys into the range {0,1,...m-1}. Such a collection is said to be "universal" if for any hash function h randomly chosen from H, the chance of a collision between distinct keys is no more than 1/m (the chance of randomly selecting the same slot twice). 
+You can design a universal class of hash functions by generating a set of module-based functions using number theory.
 -=-=- Open addressing
 In open addressing, all elements ocupy the hash table itself. Each table entry contains either an element of the dynamic set or nil, rather than a chain of elements. Thus, with open addressing, a table can "fill up"; load factor cannot be > 1. 
 The advantage of open addressing is that it does not require pointers. The extra memory allows us to have a larger tables. Instead of following pointers, we must compute the sequence of slots to be examined. 
@@ -121,14 +121,14 @@ repeat
 until T[j] == nil or i == m
 return nil
 -= Deletion is difficult, since if we replace an element with nil, the sequence traversed when searching for another element could break. Thus, we use a value other than nil to indicate "deleted". However, this make search times no longer depend on the load factor. That's why chaining is more commonly used when we need deletion functionality. 
-For open addressing to work, we assume "uniform hashing": the probe sequence of each key is equally likely to me any of the m! permitations of {0,1,...,m-1}. This extends "simple uniform hashing" from above to define a hash functin that produces not just a single number, but a sequence of numbers.
+For open addressing to work, we assume "uniform hashing": the probe sequence of each key is equally likely to me any of the m! permitations of {0,1,...,m-1}. This extends "simple uniform hashing" from above to define a hash function that produces not just a single number, but a sequence of numbers.
 True uniform hashing is hard. 3 common techniques for comupting probe sequences for open addressing are: linear probing, quadratic probing, and double hashing. Double hashing seems to work best. 
 -=- analysis of open addressing (assuming uniform hashing)
 Given an open-address hash table with load factor a = n/m < 1, the expected number of probes in an unsuccessful search is at most 1/(1-a). That's 2n a half full table, 10 in a table 90% full.
 Inserting an element into an open-address hash table with load factor a requires at most 1/(1-a) probes on average.
 Given an open-address hash table with load factor a<1, the expected number of probes in a a successful search is at most (1/a)*ln(1/(1-a)). Half full: 1.287 probes. If 90% full, 2.559 searches.
 -=-=- Perfect Hashing
-We call a hashing technique "perfect hashing" if O(1) memory accesses are required to perform a search in the work case. This can be done if the set of keys is status (once the keys are stored in the table, they don't change).
+We call a hashing technique "perfect hashing" if O(1) memory accesses are required to perform a search in the work case. This can be done if the set of keys is static (once the keys are stored in the table, they don't change).
 To reate a perfect hashing scheme, we use 2 levels of hashing, with universal hashing at each level: 
   1) The first level is the same as for hashing with chaining: hash the n keys into m slots using hash function h carefully chosen from a family of universal hash functions. 
   2) Intead of making a linked list of the keys hashing to slot j, we use a small secondary hash table with an associated hash function. By choosing the hash functions carefully, we can guarantee there are no collisions in the secondary level. In order to ensure no collisions, the size of the inner hash table must be the square of the number of keys hashing to slot j. This seems like it would require a lot of memory, but it turns out to be only O(n) for the primary hash table and each secondary hash table.
@@ -152,11 +152,11 @@ You can think of a hash map node as having the following properties:
  - next (pointer to next node in the bucket, should one exist)
 
 SEARCH TREES
-Supports many dynamic set properties, including SEARCH, MINIMUM, MAXIMUM, PREDECESSOR, SUCCESSOR, INSERT, and DELETE. Generally, these opertations can be performed in best case O(logn) and worst case O(n)
+Supports many dynamic set properties, including SEARCH, MINIMUM, MAXIMUM, PREDECESSOR, SUCCESSOR, INSERT, and DELETE. Generally, these operations can be performed in best case O(logn) and worst case O(n)
 Thus, we can use a search tree both as a dictionary and as a priority queue.
 
 Binary Search Trees
-Each node is an object containing satellite data, and attribute left, right, and p (parent).
+Each node is an object containing satellite data, and attributes left, right, and p (parent).
 For any node x, the keys in the left subtree are at most x.key, and the keys in the right subtree are at least x.key.
 The worst case running time for most search-tree operations is proportional to the height of the tree. 
 INORDER-TREE-WALK(x)  // print all nodes in non decreasing order (O(n) time)
@@ -165,7 +165,7 @@ if x != nil
   print x.key
   INORDER-TREE-WALK(x.right)
 PREORDER-TREE-WALK(x) // print the root before the values in either tree
-  Useful for printing our a heirarchy
+  Useful for printing out a heirarchy
 POSTORDER-TREE-WALK(x) // print the root after the values in either tree
   Useful for executing operations described by a tree (such as cumulative arithmatic)
 TREE-SEARCH-RECURSIVE(x, k) // O(h) where h is the height of the tree, since we traverse a simple path down the tree
@@ -230,7 +230,7 @@ TREE-INSERT(T,z)
 3 cases:
   1) if z has no children, remove it by modifying parent to replace z with nil as its child.
   2) if z has one child, then we elevate that child to take z's position in the tree by modifying z's parent to replace z with z's child.
-  3) if z has 2 children, we find z's successor y (in z's right subtree) and have y take z's position in the tree. The rest of z's right subtree becomes y's new right subtree, and z's left subtree becomes y's new left subtree. This is tricky, as it matters whether y is z's right or left child.
+  3) if z has 2 children, we find z's successor y (in z's right subtree) and have y take z's position in the tree. The rest of z's right subtree becomes y's new right subtree, and z's left subtree becomes y's new left subtree. This is tricky, as it matters whether y is in z's right or left subtree.
 ---
 TRANSPLANT(T,u,v)  // helper function used in node deletion. Replaces one subtree (u) as a child of its parent with another subtree (v)
 if u.p == nil  // u is root of T
@@ -246,17 +246,17 @@ if z.left == nil
   TRANSPLANT(T, z, z.right)  // no left child; replace node with its right child
 else if z.right == nil
   TRANSPLANT(T, z, z.left)  // no right child; replace node with its left child
-else y = TREE-MINIMUM(z.right)  // find successor of the node's right subtree
-  if y.p != z  // case where the z's successor is NOT its right child; swap it with z's right child
+else y = TREE-MINIMUM(z.right)  // find successor in the node's right subtree
+  if y.p != z  // case where z's successor is NOT its right child; swap it with z's right child
     TRANSPLANT(T, y, z.right)
     y.right = z.right
-    y.pright.p = y
+    y.right.p = y
   TRANSPLANT(T,z,y)  // swap z with (what we now know to be) its right child
   y.left = z.left
   y.left.p = y
 
 Red Black Trees
-If the hieght of a binary search tree is large, the operations may run more like O(n) like a linked list. Red-black trees are one of many trees that are "balanced" to guarantee operations take O(logn) time in the worst case.
+If the height of a binary search tree is large, the operations may run more like O(n) like a linked list. Red-black trees are one of many trees that are "balanced" to guarantee operations take O(logn) time in the worst case.
 Red-black tree nodes have a color attribute, as well as p, left, right, key. By constraining node colors on any simple path from root to leaf, red-black trees ensure that no such path is > twice as long as any other, so the tree is balancedish.
 If a child or parent node doesn't exist, it is said to point to T.Nil (a sentinel), which is said to be black.
 RB tree properties:
@@ -265,7 +265,7 @@ RB tree properties:
  - every leaf (Nil) is black
  - if a node is red, then both its children are black
  - For each node, all simple paths from the node to descendant leaves contain the same number of black nodes.
-These 5 properties must be maintained during insertion and deletion. As a result of maintaining them a red-black tree with n internal nodes has heightat most 2lg(n+1).
+These 5 properties must be maintained during insertion and deletion. As a result of maintaining them a red-black tree with n internal nodes has height at most 2lg(n+1).
 TODO: Implement a RB tree.
 
 Order-Statistic Tree

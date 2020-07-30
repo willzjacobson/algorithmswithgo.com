@@ -8,8 +8,8 @@ func mergeSort(nums []int) {
 	}
 
 	midInd := len(nums) / 2
-	left := append([]int(nil), nums[:midInd]...)
-	right := append([]int(nil), nums[midInd:]...)
+	left := append([]int{}, nums[:midInd]...)
+	right := append([]int{}, nums[midInd:]...)
 
 	mergeSort(left)
 	mergeSort(right)

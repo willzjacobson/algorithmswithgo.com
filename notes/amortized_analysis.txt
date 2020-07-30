@@ -1,5 +1,5 @@
 In amortized analysis, we average the time required to perform a sequence of data-structure operations over all the operations performed.
-With amortized analysis, we can show that the average cost of an operation is small if we average over a sequence of operationss, even though a single operation within the sequence might be expensive.
+With amortized analysis, we can show that the average cost of an operation is small if we average over a sequence of operations, even though a single operation within the sequence might be expensive.
 Probability is not involved.
 
 3 methods:
@@ -11,5 +11,5 @@ We assign differing charges to different operations. We call the charge on an op
 When an operation’s amortized cost exceeds its actual cost, we assign the difference to specific objects in the data structure as credit. Credit can help pay for later operations whose amortized cost is less than their actual cost. 
 We must choose amortized cost of operations such that we actually get an upper bound on the actual cost of the sequence.
 3) Potential Method
-Instead of representing prepaid work as credit stored with specific objects in the data structure, the potential method of amortized analysis represents the prepaid work as “potential energy,” or just “potential,” which can be released to pay for future operations. The potential is stored in the data strructure as a whole.
+Instead of representing prepaid work as credit stored with specific objects in the data structure, the potential method of amortized analysis represents the prepaid work as “potential energy,” or just “potential,” which can be released to pay for future operations. The potential is stored in the data structure as a whole.
 The amortized cost of each operation is its actual cost, plus the change in potential due to the operation.

@@ -14,7 +14,7 @@ func quickSort(nums []int, start, end int) {
 		nums[end], nums[p] = nums[p], nums[end]
 
 		// all values in 'nums' < nums[pivot] go to the left of pivot,
-		// all values in 'nums' > nums[pivot]go to the left of pivot.
+		// all values in 'nums' > nums[pivot]go to the right of pivot.
 		pivot := partition(nums, start, end)
 
 		// Sort subarrays to the left and right of pivot

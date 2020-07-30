@@ -1,7 +1,7 @@
 
 Definitions
  - In place: A sorting algorithm sorts "in place" if only a constant number of elements of the input array are ever stored outside the array.
- - Comparison sorts: algorithms that determine the sorted order of an input array by comparing elements (quick, merge, bubble, insertion, heap, quick)
+ - Comparison sorts: algorithms that determine the sorted order of an input array by comparing elements (quick, merge, bubble, insertion, heap).
  - Linear sorting: algorithms that treat the problem of sorting as a single large operation.
  - Divide and Conquer: algorithms that partition the data to be sorted into smaller sets that can be independently sorted.
 
@@ -46,7 +46,7 @@ Performs well on small sample sizes that are already quite well sorted
 Summary:
 On Each Pass
  - Compare each array item to it’s right neighbor
- - If the right neighbor is smaller then Swap right and left
+ - If the right neighbor is smaller then swap right and left
  - Repeat for the remaining array items
 
 Selection Sort
@@ -62,7 +62,7 @@ Summary:
 Quick Sort (divide and conquer)
 O(n^2) worst case 
   not good for inverse sorted, or sorted data sets, as these result in unbalanced partitioning
-  since this is common in engineering scenarios, we ramdomize the placement of the pivot in the array to partition
+  since this is common in engineering scenarios, we randomize the placement of the pivot in the array to partition
 O(nlogn) average case
   much closer to the best case than the worst case,
   as even a 99-1 split runs asymtotically in nlogn time. Only a 100-0 split runs in n^2 time

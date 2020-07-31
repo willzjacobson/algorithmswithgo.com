@@ -62,12 +62,12 @@ Conditional Probability and Independence
 Conditional probability formalizes the notion of having prior partial knowledge of the outcome of an experiment. The conditional probability of an event A given that another event B occurs is defined to be Pr{A|B} = Pr{A n B}/Pr{B} 
 wherever Pr{B} != 0. (We read “Pr{A|B}” as “the probability of A given B.”)
 Intuitively, since we are given that event B occurs, the event that A also occurs is A n B (A n B is the set of outcomes in which both A and B occur). We normalize the probabilities of all the elementary events in B by dividing them by Pr{B}, so they sum to 1 and thus are taken for granted as occurring. The conditional probability of A n B, therefore is the ratio of event A n B to the probability of event B. 
-Ex: a coin is flipped twice, and we're told the first flip is heads. If A is the event that both flips are heads, and B is the event that at least 1 coin is a head, PR{A|B}=(1/4)/(3/4) = 1/3.
+Ex: a coin is flipped twice, and we're told the first flip is heads. If A is the event that both flips are heads, and B is the event that at least 1 coin is a head, Pr{A|B}=(1/4)/(3/4) = 1/3.
 
 2 events are "independent" if Pr{A n B} = Pr{A}Pr{B}, which is equivalent (if Pr{B} != 0) to Pr{A|B} = Pr{A}.
 Ex: we flip 2 fair coins. Event A is that the first comes up H, and event B is that the 2 coins come up differently. Each of these events have a 1/2 chance of occuring, and there is a 1/4 chance they both occur. Thus, they are independent, and Pr{A|B} = Pr{A}.
 
-A collection A1, A2, ..., An of events is said to be "pairwise dependent" if
+A collection A1, A2, ..., An of events is said to be "pairwise independent" if
 Pr{Ai n Aj} = Pr{Ai}Pr{Aj}
 for all 1 <= i <= j <= n.
 
@@ -79,7 +79,7 @@ Ex. we flip 2 fair coins. Let A1 be the event that the 1st is H, A2 be the event
 Pr{A1} = 1/2, Pr{A2} = 1/2, Pr{A3} = 1/2,
 Pr{A1 n A2} = 1/4, Pr{A1 n A3} = 1/4, Pr{A2 n A3} = 1/4,
 and Pr{A1 n A2 n A3} = 0.
-Since for 1 <= i <= j <= 3 we have Pr{Ai n Aj} = Pr{Ai}Pr{Aj} = 1/4, the events A1, A2, and A3 are pairwise independent. They are not mutually independent, however, because Pr{A1 n A2 n A3} = 1/8 != 0.
+Since for 1 <= i <= j <= 3 we have Pr{Ai n Aj} = Pr{Ai}Pr{Aj} = 1/4, the events A1, A2, and A3 are pairwise independent. They are not mutually independent, however, because Pr{A1}Pr{A2}Pr{A3} = 1/8 != 0.
 
 Random Hiring Problem
 We interview candidates one-by-one, and replace the current worker with any applicant deemed better.

@@ -1,16 +1,16 @@
 B-Trees
-Similar balanced search trees designed to work well on dists or other direct-access secondary storage devices. They are similar to red-black trees, but better at minimizing disk I/O operations. Many database systems use B-trees (or variants thereof) to store information.
-B-trees differ from red-blakc trees in that each node may have as many as thousands of children (that is, the branching factor can be large). 
-B-trees are similar to red-black trees in that each node has height O(lgn). However, since the height can be much less, the base of the log that expresses its height can be much larger.
-If an internal B-tree node x contains x.n keys, then it has x.n+1 children. They keys in x serve as dividing points eparating the rangs of keys handled by x into x.n+1 subranges. Each subrange is handled by a child of x. 
-Disk operations are much slower than main memory operations. If we have a B-tree stored on disk, a large branching factor reduces the height of the tree, and thus reduces the number of disk operations that must be performed to find and operate on a node in a B-tree. Thus, a B-tree node is usually the size of a wole disk page (the amount of data that can be read/written in a single disk action), and is limited by the page size.
-Lets say we have a B-tree stored in memory that has a branching factor of 1000. If we keep the root node stored in main memory (RAM; much faster look-up than disk), we can find any of the 1 billion nodes with at most 2 disk look-ups. 
+Similar balanced search trees designed to work well on disks or other direct-access secondary storage devices. They are similar to red-black trees, but better at minimizing disk I/O operations. Many database systems use B-trees (or variants thereof) to store information.
+B-trees differ from red-black trees in that each node may have as many as thousands of children (that is, the branching factor can be large). 
+B-trees are similar to red-black trees in that each node has height O(lg n). However, since the height can be much less, the base of the log that expresses its height can be much larger.
+If an internal B-tree node x contains x.n keys, then it has x.n+1 children. They keys in x serve as dividing points separating the ranges of keys handled by x into x.n+1 subranges. Each subrange is handled by a child of x. 
+Disk operations are much slower than main memory operations. If we have a B-tree stored on disk, a large branching factor reduces the height of the tree, and thus reduces the number of disk operations that must be performed to find and operate on a node in a B-tree. Thus, a B-tree node is usually the size of a whole disk page (the amount of data that can be read/written in a single disk action), and is limited by the page size.
+Lets say we have a B-tree stored in memory that has a branching factor of 1000. If we keep the root node stored in main memory (RAM; much faster look-up than disk), we can find any of 1 billion nodes with at most 2 disk look-ups. 
 A B+-tree is a common variant of a B-tree that stores all the satelite info in the leaves and stores only keys and child pointers in the internal nodes, thus maximizing the branching factor of the internal nodes.
 
 B-tree definition
 A B-tree is a rooted tree (whose root is T.root) having the following properties:
-1) Every node x has teh following attributes:
-  a) x.n, the number of keys currency stored in node x
+1) Every node x has the following attributes:
+  a) x.n, the number of keys currently stored in node x
   b) the x.n keys are stored in non-decreasing order
   c) x.leaf, a boolean value that is TRUE if x is a leaf and FALSE if x is an internal node
 2) Each internal node x also contains x.n+1 pointers to its children x.c1, x.c2,...,x.cx.n+1. Leaf nodes have no children, so their ci attributes are undefined.
@@ -19,9 +19,9 @@ A B-tree is a rooted tree (whose root is T.root) having the following properties
 4) All leaves have the same depth, which is the tree's height h.
 5) Nodes have lower and upper bounds on the number of keys they can contain. We express these bounds in terms of a fixed integer t>=2 called the "minimum degree" of the B-tree:
   a) Every node other than the root must have >= t-1 keys. Every internal node other than the root thus has >=t children. If the tree is nonempty, the root must have >=1 key.
-  b) Every node may contain at most 2t-1 keys. Therefore, an internal node may have at most 2t children. We say a node is "full" if it contains exactly 2t-1 keys. note: another viant called a B*-tree requires all nodes to be >= 2/3 full. 
+  b) Every node may contain at most 2t-1 keys. Therefore, an internal node may have at most 2t children. We say a node is "full" if it contains exactly 2t-1 keys. note: another variant called a B*-tree requires all nodes to be >= 2/3 full. 
 
-The simplest B-tree occurs when t=2. Every internal node then has either 2,3, or 4 children (this is called a 2-3-4 tree). Generally t is much larger to reduce h, since the number of disk accesses for most operations on a B-tree is porprtional to h.
+The simplest B-tree occurs when t=2. Every internal node then has either 2,3, or 4 children (this is called a 2-3-4 tree). Generally t is much larger to reduce h, since the number of disk accesses for most operations on a B-tree is proportional to h.
 If n>=1, then for any n-key B-tree of height h and minimum degree t>=2:
   h <= logt((n+1)/2)  (that's log with base t)
 
@@ -31,7 +31,7 @@ B-TREE-SEARCH(T.root,k)  // takes the root of a subtree, and a key to search for
  - Much like searching in a binary tree, except at each internal node x, we make an (x.n+1)-way branching decision.
  - Returns the node y and the index i such that y.keyi = k, or nil if no node is found to contain the key k.
 B-TREE-CREATE()
-B-TREE-INSERT
+B-TREE-INSERT(x) // insert node
 Inserting is more complex than inserting a key into a binary search tree, because rather than just creating a new node, we must insert the new key into an existing leaf node. We must also have a procedure for splitting full nodes that we encounter, since we can't insert new keys into full nodes. We split a node around its median k, x.keyt. 
 The only way a tree grows is by node splitting. 
 The only way to increase a B-tree's height is by splitting the root (this is different from a binary search tree, where height increases by adding new nodes at the bottom).
@@ -39,7 +39,7 @@ The only way to increase a B-tree's height is by splitting the root (this is dif
 The above operations are all "one-pass" operations that proceed downward from the root of the tree, without having to back up.
 We assume we always keep the root in main memory, so it does not require a disk read to access. However, it does require a disk write to update.
 
-B-TREE-DELETE(T.root,k) // deletes the key k from the subtree rooted at x. Runs in time O(t logtn).
+B-TREE-DELETE(T.root,k) // deletes the key k from the subtree rooted at x. Runs in time O(t logt n).
 Deletion is analagous to insertion, but more complex because we can delete a key from an internal node or a leaf, whereas we only add to a leaf. When we delete from an internal node, we have to rearrange the children.
 Just as we ensure we don't let a node get too big during insertion, we have to ensure it doesn't get too small during deletion (only the root can have fewer than t-1 keys). Just as the insertion algorithm may have to back up if a node on the path to where the key was to be inserted was full, a deletion algorithm may have to back up if a node (other than the root) along the path to where the key is to be deleted has the minimum number of keys.
 We design the deletion procedure such that before it calls itself recursively on a node, we ensure that node has at least t (1 greater than the minimum) keys, so that one could theoretically be deleted.
@@ -53,14 +53,14 @@ Fibonacci-heap
 
 A mergable Heap is a data structure that supports the following 5 operations, in which each element has a key:
   MAKE-HEAP()  // creates and returns a new heap contining no empty elements
-  INSERT(J, x)  // inserts element k, whose key has already been fulled in, into heap H
+  INSERT(H, k)  // inserts element k, whose key has already been fulled in, into heap H
   MINIMUM(H)  // returns a pointer to the element in heap H whose key is minimum
   EXTRACT-MIN(H)  // deletes the element from heap H whose key is minimum, returning a pointer to the element
   UNION(H1, H2)  // creates and returns a new heap that contains all the elements of heaps H1 and H2 (H1 and H2 are destroyed).
 Note: Default mergable heaps are min-heaps. We could also have mergable max-heap with operations MAXIMUM, EXTRACT-MAX, and INCREASE-KEY.
 Fibonacci-heaps also support these 2 operations:
   DECREASE-KEY(H,x,k)  // assigns to element x within heap H the new key value k, which we assume to be no greater than its current key value.
-  DELETE(H,k)  // delete element x from heap H
+  DELETE(H,k)  // delete element k from heap H
 
 Running times for operations on 2 implementations of mergable heaps:
 procedure           Binary Heap (worst case)        Fibonacci-heap (ammortized)
@@ -88,7 +88,7 @@ Circular, doubly linked lists are handy because:
   - we can concatenate 2 lists into 1 in O(1) time.
 Each node has 2 more qualities:
   - We store the number of children in the child list of a node x as x.degree.
-  - x.mark is a boolean that records whether x has lost a child since the last time x was made the child of another node. (Ff a marked node has a child removed, the node is moved to the root list and unmarked. This happens in DECRESE-KEY)
+  - x.mark is a boolean that records whether x has lost a child since the last time x was made the child of another node. (If a marked node has a child removed, the node is moved to the root list and unmarked. This happens in DECRESE-KEY)
 We access a Fib heap H by a pointer to the root of a tree containing the minimum key (we call this the "minimum node"). If the same key occurs in the root of another tree, either can serve as the minimum node. When H is empty, H.min is nil.
 The roots of the trees are linked together via left/right in a circular doubly linked list called the "root list" of the heap. Trees may appear in any order.
 H.n tracks the number of nodes currently in H.
@@ -102,9 +102,9 @@ We avoid consolidating nodes in the root list into trees until we really have to
 MINIMUM  Simple: H.min points to it.
 UNION  We simply concatenate the root lists of H1 and H2, and determine the new H.min. All roots remain roots.
 EXTRACT-MIN  is the more complex, and it is also where the delayed work of consolidating trees in the root list finally occurs. 
-Moves each child z of H.min to the root list and set z.p to nil, then removes H.min from the root list. If z is its own right child, set H.min to nil. Else, set H.min to z.right, which may not actually be the new min. Then calls CONSOLIDATE(H) helper function, which consolidates the root list bu repeatedly performing the following steps until every root in the root list has a distinct degree:
+Moves each child z of H.min to the root list and set z.p to nil, then removes H.min from the root list. If z is its own right child, set H.min to nil. Else, set H.min to z.right, which may not actually be the new min. Then calls CONSOLIDATE(H) helper function, which consolidates the root list by repeatedly performing the following steps until every root in the root list has a distinct degree:
  1) Find 2 roots x and y in the root list with the same degree. Without loss of generality, let x.key <= y.key.
- 2) Link y to x: trmove y from the root list, and make y a child of x using a helper FIN-HEAP-LINK, which increments the attribute x.degree and clears the mark on y.
+ 2) Link y to x: remove y from the root list, and make y a child of x using a helper FIN-HEAP-LINK, which increments the attribute x.degree and clears the mark on y.
 A helper array A is used from [1,2,...,D(n)], which is a temp holder for root nodes of the root list as they are consolidated. The nodes are then taken from A and put back in H. There will be fewer than at the start.
 Note that the maximum degree D(n) is O(lgn).
 DECREASE-KEY
@@ -115,7 +115,7 @@ DELETE  simply calls DECREASE-KEY on the node to delete to negative infinity, th
 
 -=-=-
 van Emde Boas Trees
-We've seen several data structures that support the operations of a priority queue: binary heaps, red-black trees, and Fibonacci heaps. In the case of each structure, there is at least one operation that takes O(lg n) time, either worst case or amortized. Each of these structures bases its decision on comparing keys. The lower bound on search of O(nlgn) tells us the lower bound by definition: since you could sort by inserting each the keys into the structure, then extracting the min, you can only perform sorting in O(nlgn) if both the INSERT and EXTRACT-MIN operation take O(lg n) time (since you have to do them each n times to sort a list of length n).
+We've seen several data structures that support the operations of a priority queue: binary heaps, red-black trees, and Fibonacci heaps. In the case of each structure, there is at least one operation that takes O(lg n) time, either worst case or amortized. Each of these structures bases its decision on comparing keys. The lower bound on search of O(nlgn) tells us the lower bound by definition: since you could sort by inserting each of the keys into the structure, then extracting the min n times, you can only perform sorting in O(nlgn) if both the INSERT and EXTRACT-MIN operation take O(lg n) time (since you have to do them each n times to sort a list of length n).
 But as we've seen (with counting sort, for example), you can exploit additional information to sort faster.
 Analagously, van Embde Boas Trees support the priority queue operations, and a few others, each in O(lg lg n) worst case time using additional knowledge about the set of keys. The hitch is that the keys must be integers in the range  0 - n-1, with no duplicates.
 In discussion below, we use n to denote the number of elements in the set, and u as the range of possible values (so each operation runs in O(lg lg u) time) where the highest value in the set is u-1. We assume for the sake of ease that u is an exact power of 2.
@@ -133,13 +133,13 @@ A vEB Tree is a recursive structure that stores integers using direct addressing
       The summary tree has 2 sub-clusters, each of u=2. The first tells whether the 1st and 2nd clusters pointed to by V.clusters hold >=1 element. It does this via its min and max properties: if the 1st and 2nd clusters in V.clusters each hold >=1 element, min=0 and max=1. If only the first does, min=max=0. The second tells whether the 3rd and 4th clusters pointed to by V.clusters hold >=1 element, in the same way.
       The summary tree also has a summary prop, which points to another tree of u=2. This tree records whether the 2 cluster trees pointed to by the top level summary tree each hold >= 1 element, in the same way described above.
 
-Why do the operations have a runtime of O(lg lg u), where u descrives the range of values that the tree can contain (the tree contains values of 0 - u-1)?
+Why do the operations have a runtime of O(lg lg u), where u describes the range of values that the tree can contain (the tree contains values of 0 - u-1)?
 In a red-black tree, the height is ~lg n, which means search time is O(lg n) since at most you have to traverse through lg n nodes.
 In vEB tree, the base tree has u=2, and u grows by a factor of u^2 with each level. For any value of u, we see that lg lg u = 2. Example: lg lg 16 = 2, since (2^2)^2 = 16. Thus, any operation requiring traversal has a runtime of O(lg lg u).
-To make implementation easier, let's say u=2^(2^2k) for any integer k. While this limits our set of possible values for u to 2,3,16,256,65536, it ensures u is an integer. In practice, if we're willing to make use of some techniques that allow u to be a non integer, we can have u=2^k for any integer k.
+To make implementation easier, let's say u=2^(2^k) for any integer k. While this limits our set of possible values for u to 2,4,16,256,65536, it ensures u is an integer. In practice, if we're willing to make use of some techniques that allow u to be a non integer, we can have u=2^k for any integer k.
 
 Indexing
-We need a way to index the elements of V in a way that's independent of U. 
+We need a way to index the elements of V in a way that's independent of u. 
 To find the cluster number of V that an element x would be in, we use the 'high' function:
   high(x) = x / sqrt(u)
 To find x's position within its cluster, we use the 'low' function:
@@ -154,8 +154,7 @@ Some applications involve grouping n distinct elements into a collection of disj
   1) finding the unique set that contains a given element
   2) uniting 2 sets
 This section explores methods for maintinaing a data structure that supports these operations.
-A disjoint-set data structure maintains a collection S={S1, S2, ..., Sk} of disjoint dynamic sets. We identify each set by a representative, which is some member of the set. Sometimes it doesn't matter which member is used, as long as it doesn't change unlss the set changes. Sometimes it needs to be a specific member, such as the minimum (assuming the set elements can be ordered).
-
+A disjoint-set data structure maintains a collection S={S1, S2, ..., Sk} of disjoint dynamic sets. We identify each set by a representative, which is some member of the set. Sometimes it doesn't matter which member is used, as long as it doesn't change unless the set changes. Sometimes it needs to be a specific member, such as the minimum (assuming the set elements can be ordered).
 
 Disjoint set operations (letting x denote a Set object):
   MAKE_SET(x)  creates set whose only member (and thus representative) is x. Since the sets are disjoint, we require that x not already exist in some other set.
@@ -185,16 +184,16 @@ Runtime of UNION:
 
 -=- Disjoint Set Forests
 A faster way is to represent sets as rooted trees, with each node representing one member and each tree representing one set. Each member (node) points only to its parent. The root node points to itself.
-By introducing 2 heristics, we can acheive an asymptotically optimal disjoint set data structure:
+By introducing 2 heuristics, we can achieve an asymptotically optimal disjoint set data structure:
   - "union-by-rank" (done during UNION(x,y)) and
   - "path-compression" (done during FIND-SET(x))
 
 Operations:
 MAKE-SET(x) creates a tree with only a root node x.
 FIND-SET(x) follows x's parent chain until it reaches the root. The nodes visited are called the "find path".
-UNION causes the root of one tree to point to the root of another. Unlike the linked list implementation, this implementation is just barely superlinear. Practically, it is O(n).
+UNION(x,y) causes the root of one tree to point to the root of another. Unlike the linked list implementation, this implementation is just barely superlinear. Practically, it is O(n).
 
-We need to make sure the UNION operations don't produce just a linear chain of nodes. The 2 heristics help us:
+We need to make sure the UNION operations don't produce just a linear chain of nodes. The 2 heuristics help us:
  - Union by rank. For each node, we maintain a "rank", which is an upper bound on the height of the node (the number of edges in the longest simple path from a descendant leaf to x). In "union by rank", we make the root with smaller rank point to the root with the larger rank during a UNION operation.
  - Path compression. Make each node on the "find path" point directly to the root. Path compression does not change any ranks.
 
@@ -207,14 +206,14 @@ LINK(x, y)  // helper used by UNION
   if x.rank > y.rank
     y.p = x  // ranks remain unchanged
   else
-    x.p = y
-    if x.rank == y.rank  // arbitrarily chose y as the parent. Increment its rank by 1
+    x.p = y  // We arbitrarily chose y as the parent.
+    if x.rank == y.rank  // if x and y had same rank, we must increment y's rank by 1
       y.rank++
 
 UNION(x, y)
   LINK(FIND-SET(x), FIND-SET(y))
 
-FIND-SET(x)  // FIND-SET is a 2-pass method. Makes a pass up to find the root, then makes a pass back down the find path to update each node to point directly to the root. Path compression does not change any ranks.
+FIND-SET(x)  // FIND-SET is a 2-pass method. Makes a pass up to find the root, then makes a pass back down the 'find path' to update each node to point directly to the root. Path compression does not change any ranks.
   if x != x.p
     x.p = FIND-SET(x.p)
   return x.p

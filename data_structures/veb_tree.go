@@ -6,8 +6,8 @@ import (
 )
 
 // VEBTree : implementation of a vEB-Tree
-// This implementation simplifies indexing by requiring the constraint u=2^(2^2k) for any integer k.
-// While this limits our set of possible values for u to 2,3,16,256,65536, it ensures u is an integer.
+// This implementation simplifies indexing by requiring the constraint u=2^(2^k) for any integer k.
+// While this limits our set of possible values for u to 2,4,16,256,65536, it ensures u is an integer.
 // If we were willing to make use of some techniques that allow u to be a non integer,
 // we can have u=2^k for any integer k.
 type VEBTree struct {
@@ -21,11 +21,12 @@ type VEBTree struct {
 
 // CreateVEBTree : creates a new VEBTree
 func CreateVEBTree(u int) *VEBTree {
+	null := -1
 	v := &VEBTree{
 		u:    u,
-		null: -1,
-		min:  -1,
-		max:  -1,
+		null: null,
+		min:  null,
+		max:  null,
 	}
 
 	if u > 2 {
@@ -206,7 +207,6 @@ func (v *VEBTree) Delete(x int) {
 
 	// recursive case: v has >1 element, and v.u>=4
 	if x == v.min {
-		fmt.Println("x is min:", x)
 		firstCluster := v.summary.Minimum() // first cluster containing an element (v.min is not an a cluster)
 		// set x to the value of the lowest element in that cluser (the new v.min, since we're deleting x)
 		x = v.index(firstCluster, v.cluster[firstCluster].Minimum())

@@ -3,7 +3,6 @@ package dijkstra
 import (
 	adjacencylist "algo/graph-algorithms/adjacency-list"
 	minheap "algo/graph-algorithms/min-heap"
-	"fmt"
 	"math"
 )
 
@@ -21,11 +20,11 @@ func InitSingleSource(l *adjacencylist.Weighted, s *adjacencylist.AdjListVertex)
 
 // Relax : test whether the shortest path from the source to a vertex v might pass through vertex u
 // If so, update the current best estimate to do that.
-func Relax(u *adjacencylist.AdjListVertex, e *adjacencylist.AdjListEdgeWeighted) {
-	// fmt.Println("is", e.To.D, "more than", u.D, "+", e.Weight)
+func Relax(u *adjacencylist.AdjListVertex, e *adjacencylist.AdjListEdgeWeighted, q *minheap.MinHeap) {
 	if e.To.D > u.D+e.Weight {
 		e.To.D = u.D + e.Weight
 		e.To.P = u
+		q.DecreaseKey(e.To.Index, e.To.D)
 	}
 }
 
@@ -37,14 +36,12 @@ func Dijkstra(l *adjacencylist.Weighted, s *adjacencylist.AdjListVertex) {
 	// create a min heap and insert pointers to all the vertices
 	q := minheap.CreateMinHeap()
 	for u := range l.Adj {
-		fmt.Println("inserting", u.Value, "with d value:", u.D)
 		q.Insert(u)
 	}
-	for q.Size > 0 {
-		u := q.ExtractMin()
-		fmt.Println("extracted", u.Value, "with d value:", u.D)
-		for _, e := range l.Adj[u] {
-			Relax(u, e)
+	for q.Size > 0 { // O(V) cost, since each vertex is in the queue
+		u := q.ExtractMin()          // O(lg V) cost
+		for _, e := range l.Adj[u] { // O(E) cost if you include the outer for-loop since looping through all edges for each vertex
+			Relax(u, e, q) // O(lg V) cost due to q.decreaseKey call (would be O(1) with Fibonacci-heap)
 		}
 	}
 }

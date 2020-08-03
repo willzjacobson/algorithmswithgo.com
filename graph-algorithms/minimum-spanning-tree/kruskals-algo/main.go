@@ -50,7 +50,7 @@ func MSTKruskal(l *adjacencylist.Weighted) ([]*adjacencylist.Edge, float64) {
 		disjointSets[v] = adjacencylist.CreateDisjointSet(v)
 	}
 
-	// Build array of all egdes the in the graph
+	// Build array of all edges the in the graph
 	for v := range l.Adj {
 		for _, e := range l.Adj[v] {
 			edge := &adjacencylist.Edge{

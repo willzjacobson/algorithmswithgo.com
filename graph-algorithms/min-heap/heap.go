@@ -6,7 +6,7 @@ import (
 )
 
 // Application of a min heap where the satellite data is an adjacency-list vertex
-// We store the index in the AdjListVertex type itself to be able to use the DecreaseKeys method in our implementation Prim's algorthim
+// We store the index in the AdjListVertex type itself to be able to use the DecreaseKey method in our implementation Prim's algorthim
 // This may violate the principle of separation of concerns, but *shrug*
 
 type MinHeapNode struct {
@@ -41,7 +41,7 @@ func (h *MinHeap) AssignList(vertices []*adjacencylist.AdjListVertex) {
 	}
 	h.slice = vertices
 	h.Size = len(vertices)
-	for i := len(h.slice) / 2; i >= 0; i-- {
+	for i := (len(h.slice) - 1) / 2; i >= 0; i-- {
 		h.SendNodeDown(i)
 	}
 }
@@ -72,7 +72,7 @@ func (h *MinHeap) ExtractMin() *adjacencylist.AdjListVertex {
 	return min
 }
 
-func (h *MinHeap) DecreaseKeys(i int, decreaseTo float64) {
+func (h *MinHeap) DecreaseKey(i int, decreaseTo float64) {
 	if h.Size <= i {
 		panic("heap underflow")
 	}
@@ -81,7 +81,7 @@ func (h *MinHeap) DecreaseKeys(i int, decreaseTo float64) {
 }
 
 func (h *MinHeap) bringNodeUp(i int) {
-	parentInd := i / 2
+	parentInd := (i - 1) / 2
 	for h.slice[i].Key < h.slice[parentInd].Key {
 		// change index property to match the location swap we're about to do
 		h.slice[parentInd].Index = i
@@ -90,15 +90,15 @@ func (h *MinHeap) bringNodeUp(i int) {
 		h.slice[i], h.slice[parentInd] = h.slice[parentInd], h.slice[i]
 		// update parameters and continue looping
 		i = parentInd
-		parentInd = i / 2
+		parentInd = (i - 1) / 2
 	}
 }
 
 func (h *MinHeap) SendNodeDown(i int) {
 	smallestInd := i
 	smallest := h.slice[i]
-	leftInd := i * 2
-	rightInd := i*2 + 1
+	leftInd := (i+1)*2 - 1  // accounting for off-by-1 error due to Go starting indices at 0 (if Go started at 1, would be 2i)
+	rightInd := (i + 1) * 2 // accounting for off-by-1 error due to Go starting indices at 0 (if Go started at 1, would be 2i+1)
 
 	if h.Size >= leftInd+1 && h.slice[leftInd].Key < smallest.Key {
 		smallest = h.slice[leftInd]
@@ -178,9 +178,9 @@ func TestMinHeap() {
 	heap.ExtractMin()
 	fmt.Println(heap)
 
-	heap.DecreaseKeys(5, 1)
+	heap.DecreaseKey(5, 1)
 	fmt.Println(heap)
-	heap.DecreaseKeys(5, 1)
+	heap.DecreaseKey(5, 1)
 	fmt.Println(heap.slice[0].Key, heap.slice[1].Key, heap.slice[2].Key, heap.slice[3].Key, heap.slice[4].Key, heap.slice[5].Key, heap.slice[6].Key, heap.slice[7].Key)
 }
 

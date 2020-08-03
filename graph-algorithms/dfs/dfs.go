@@ -15,7 +15,7 @@ var time = 0
 
 // DFS : DFS implementation on a graph modelled as an adjacency-list
 // The resulting depth-first forest will actually come out slightly differently
-// depending on the order of the keys adjacency-list iterates through which the loop iterates
+// depending on the order of the keys of the adjacency-list iterates through which the loop iterates
 func DFS(g *adjacencylist.AdjacencyList) {
 	// set up adjacency-list
 	for v := range g.Adj {

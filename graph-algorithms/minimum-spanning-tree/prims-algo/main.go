@@ -73,7 +73,7 @@ func buildWeightedAdjListForPrim() *adjacencylist.Weighted {
 	return l
 }
 
-// MSTPrim : implementation of Kruskal's algorithm for determining a minimum spanning tree of a graph
+// MSTPrim : implementation of Prim's algorithm for determining a minimum spanning tree of a graph
 // updates the parent prop of each vertex to point to the vertex via which it joined the tree
 // 2nd parameter is an arbitrary vertex to serve as the root for the MST
 // returns the total weight, just so we can check our answer
@@ -82,7 +82,7 @@ func MSTPrim(l *adjacencylist.Weighted, r *adjacencylist.AdjListVertex) float64 
 	q := minheap.CreateMinHeap()                                          // create a min heap to manage the greediness
 	dictOfVerticesStillInQueue := map[*adjacencylist.AdjListVertex]bool{} // data structure to keep track of which vertices are still in the queue (min heap)
 	r.Key = 0                                                             // to ensure it is dequeued from the min-heap first
-	// set the Key of each vertex to infinity (excpet the root), and add them to the queue
+	// set the Key of each vertex to infinity (except the root), and add them to the queue
 	for v := range l.Adj {
 		if v != r {
 			v.Key = math.Inf(1) // initially, set keys to +infinity
@@ -96,17 +96,14 @@ func MSTPrim(l *adjacencylist.Weighted, r *adjacencylist.AdjListVertex) float64 
 		// but will have the least weight to be added to the tree compared to all other vertices not yet in the tree.
 		// Hence it will be the greedy choice, and thus the next one to attach
 		u := q.ExtractMin()
-		totalWeight += u.Key // add the cost incurred to add this vertex to the tree
-		fmt.Println("-=- processing:", u.Value, "of weight:", u.Key)
+		totalWeight += u.Key                  // add the cost incurred to add this vertex to the tree
 		dictOfVerticesStillInQueue[u] = false // document that this vertex is no longer in the queue
 		for _, e := range l.Adj[u] {          // loop through all the edges that this vertex has with other vertices
-			fmt.Println(" edge to:", e.To.Value, "of weight", e.Weight)
 			// since we've just added u to the tree, we can now update the keys of the adjacent vertices to reflect
-			// the cost of adding each one to the tree by makin u its parent
+			// the cost of adding each one to the tree by making u its parent
 			if dictOfVerticesStillInQueue[e.To] && e.Weight < e.To.Key {
-				fmt.Println("  setting parent of", e.To.Value, "to", u.Value)
 				e.To.P = u
-				q.DecreaseKeys(e.To.Index, e.Weight) // DecreaseKeys call may reorder the vertex in the queue, enforcing our greediness
+				q.DecreaseKey(e.To.Index, e.Weight) // DecreaseKey call may reorder the vertex in the queue, enforcing our greediness
 			}
 		}
 	}

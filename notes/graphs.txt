@@ -221,12 +221,56 @@ See example in code in this repo of DIJKSTRA's algo.
 Runtime:
  - Initializing the min queue is O(V) (that's not in a loop, so winds up not mattering)
  - The while loop runs once for each index.
-   - we extract the min from the queue O(1)
+   - we extract the min from the queue O(lg v)
    - we loop through each edge an index has (since we're in the loop that brings us to O(V+E))
      - we call relax, which implicitly has a Queue.DecreaseKey call, which is on its own is O(lg v)
 Thus, using a binary heap, we're at O((lg V)*(V+E)). That becomes O(E lg V) if all vertices are reachable from the source.
 Potential improvement: a Fibonacci heap would do ExtractMin in O(lg V), and DecreaseKey in O(1). Thus, if we swap out a the binary heap for a Fibonacci heap, we could acheive O(Vlg v + E).
 Historically, development Fibonacci heap was actually motivated by the fact that Dijkstra's algo typically makes many more DecreaseKey calls than ExtractMin calls. So in this case, a Fib heap lets us shift the cost of the queue operations up out of the inner loop. 
+
+-=- A* ("A-star") Search Algorithm
+Single-pair shortest-path problem
+ - Starting from a given node, it aims to find a shortest-path to a goal node, building a predecessor graph as it goes.
+ - An extension of Dijkstra's algo, that uses a heuristic to guide its search.
+ - O(b^d) space complexity, since it stores all nodes in memory. 
+   In real travel-routing systems, it's generally out-performed by algos that can pre-process the graph, as well as memory-bounded approaches.
+   - b: branching factor (avg number of edges per node)
+   - d: depth of the solution (how many edges must be traversed to reach the goal).
+ - In each round of the main loop, A* minimizes the function f(n) = g(n) + h(n). 
+    - n is the next node
+    - g(n) is the weight of the path from the start to the node
+    - h(n) is a heuristic function that is specific to the use case.
+      h(n) should be "admissible", meaning it never overestimates the actual cost.
+      For example, on a map, it could be the "as the crow flies" distance, from node n to the goal.
+  - Terminates when there are no paths left to extend, or when it reaches the goal node.
+Performance
+ - If winds up exploring the whole graph, the time complexity is the same as Dijkstra's algo: O((V+E)lgV)
+   (but its intention is not to explore the whole graph)
+
+pseudocode:
+A*(start, goal, h)   // h is heuristic function
+  openSet := {start}  // min-heap containing only the start node. Key is the fScore value (defined below)
+  nodesInOpenSet := empty map of booleans  // keep track of which nodes are in q (to avoid searching)
+  cameFrom := {}  // map: cameFrom[n] is the "parent" node in a cheapest path
+  gScore := map with default val of infinity for all nodes  // records the cheapest path known from start to n
+  gScore[start] = 0
+  fScore := map with default val of infinity for all nodes  // fScore[n] := gScore[n] + h(n). Our best guess of lowest possible weight for a path from start to end if it goes through node n.
+  fScore[start] = h(start)
+
+  while openSet not empty
+    current := openSet.Minimum() // node in q with min fScore
+    if current == goal, return;
+    openSet.ExtractMin()
+    for each edge of current
+      if gScore[edge.to] > gScore[edge.to] + edge.weight
+        // found a lower weight path to the node this edge points to!
+        cameFrom[edge.to] = current
+        gScore[edge.to] = gScore[edge.to] + edge.weight
+        fScore[edge.to] = gScore[edge.to] + h[edge.to] // implicit q.decreaseKey call here
+        if !nodesInOpenSet[edge.to]
+          openSet.Insert(edge.to)
+          nodesInOpenSet[edge.to] = true
+  return FAIL  // q is empty but goal never reached
 
 -=- All-Pairs Shortest Paths
 Here we consider the problem of, given a weighted, directed graph, finding shortest paths between all pairs of vertices in a graph. For example, making a table of distances between all paris of cities for a road atlas. 

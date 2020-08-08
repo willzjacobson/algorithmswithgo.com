@@ -307,12 +307,12 @@ Each loop will invoke an operation similar to matrix multiplication. We'll start
 O(V^4) implementation:
 We know the shortest paths problems already have optimal substructure for dynamic-programming, since all subpaths of a shortest path are themselves shortest paths.
 Our initial solution starts with the observation that W is the shortest-paths matrix when considering paths that have m=1 edge.
-It then performs n-2 loops, extending the shortest paths computed so far by 1 edge each time through loop using a helper function EXTEND-SHORTEST-PATHS(L,W).
+It then performs n-2 loops, extending the shortest paths computed so far by 1 edge each time through the loop using a helper function EXTEND-SHORTEST-PATHS(L,W).
 EXTEND-SHORTEST-PATHS(L,W) takes the previous shortest paths matrix L(m), which contains all shortest paths of maximum length m, and uses W to compute L(m+1).
 We do this n-1 times, since all shortest paths will have at most n-1 edges if G contains no negative weight cycles.
 EXTEND-SHORTEST-PATHS builds the next L(m) from W and L(m-1) using this key operation:
   l(m)ij = min(l(m-1)ij, l(m-1)ik + wkj), where for k we try all possible predecessors of vertex j.
-The EXTEND-SHORTEST-PATHS operation resembles matric multiplaction in its triple nested loop structure, and runs in O(V^3). Looping through it |V| times this takes O(V^4) time.
+The EXTEND-SHORTEST-PATHS operation resembles matrix multiplaction in its triple nested loop structure, and runs in O(V^3). Looping through it |V| times this takes O(V^4) time.
 
 Improving the O(V^4) Implementation
 We don't actually want all the L(m) matrices; we only really care about L(n-1).

@@ -40,7 +40,7 @@ func GenerateNewMatrixBool(n int) AdjacencyMatrixBool {
 }
 
 // PrintAllPairsShortestPaths : given a precessessor graph in the form of an adjacency-matrix,
-// print the shortest path from vertex i to vertex j
+// print the shortest paths from vertex i to vertex j
 func PrintAllPairsShortestPaths(π AdjacencyMatrix, i, j int) {
 	if i == j {
 		fmt.Println(i)

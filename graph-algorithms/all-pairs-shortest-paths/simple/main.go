@@ -16,49 +16,55 @@ func generateStartingAdjacencyMatrix() helpers.AdjacencyMatrix {
 	}
 }
 
-func extendShortestPaths(l helpers.AdjacencyMatrix, w helpers.AdjacencyMatrix) helpers.AdjacencyMatrix {
+func extendShortestPaths(m helpers.AdjacencyMatrix, w helpers.AdjacencyMatrix) helpers.AdjacencyMatrix {
 	// generate a new matrix that will contain the extended shortest paths
-	n := len(l)
-	lNext := helpers.GenerateNewMatrix(n, math.Inf(1))
+	n := len(m)
+	mNext := helpers.GenerateNewMatrix(n, math.Inf(1))
+	fmt.Println("-=- GO", m[4])
 	// determine the value of each entry of the new shortest paths matrix (requies 3 nested loops, like matrix multiplication)
-	for i := 0; i < n; i++ {
+	for i := 4; i < n; i++ {
 		for j := 0; j < n; j++ {
 			for k := 0; k < n; k++ {
 				// The value is the min of the previous shortest path weight (if one exists)
 				// and the path weight generated using all possible predecessors of j
-				lNext[i][j] = math.Min(lNext[i][j], l[i][k]+w[k][j])
+				mNext[i][j] = math.Min(m[i][j], mNext[i][k]+w[k][j])
+				if j == 0 {
+					fmt.Println("HELLO from ", k, m[i][j], mNext[i][k]+w[k][j], mNext[i][j])
+				}
+				// fmt.Println(i, j, k, "| was:", m[i][j], "now:", mNext[i][j])
 			}
 		}
 	}
-	fmt.Println("-=- Next shortest paths matrix:")
-	// fmt.Println(lNext)
-	return lNext
+	fmt.Println("should be 8:", mNext[4][0])
+	return mNext
 }
 
 // O(V^4) implementation
 func slowAllPairsShortestPaths(w helpers.AdjacencyMatrix) helpers.AdjacencyMatrix {
 	n := len(w)
-	l := w
+	m := w
 	// loop |E|-2 times (since the shortest paths will be m=|E|-1 at longest,
 	// and w already gives us the all-pairs shortest-paths matrix for m=1)
 	for i := 2; i < n; i++ {
-		l = extendShortestPaths(l, w)
+		m = extendShortestPaths(m, w)
+		fmt.Println("AFTER ROUND", n-2, ": ", m[4])
+		break
 	}
-	return l
+	return m
 }
 
-// O(V^4) implementation
+// O(lgV V^3) implementation
 func fasterAllPairsShortestPaths(w helpers.AdjacencyMatrix) helpers.AdjacencyMatrix {
 	n := len(w)
-	l := w
-	m := 1
+	m := w
+	kk := 1
 	// This time, loop until m > n-1, doubling m each time through the loop
 	// Total of lg n-1 rounds, which is better than n-2
-	for m < n-1 {
-		l = extendShortestPaths(l, l)
-		m *= 2
+	for kk < n-1 {
+		m = extendShortestPaths(m, m)
+		kk *= 2
 	}
-	return l
+	return m
 }
 
 func main() {
@@ -68,7 +74,7 @@ func main() {
 	fmt.Println("-=- result from O(V^4) algorithm:")
 	fmt.Println(APSPSlow)
 	fmt.Println("-=-=-=-")
-	APSPFaster := fasterAllPairsShortestPaths(w)
-	fmt.Println("-=- result from O(lgV V^3) algorithm:")
-	fmt.Println(APSPFaster)
+	// APSPFaster := fasterAllPairsShortestPaths(w)
+	// fmt.Println("-=- result from O(lgV V^3) algorithm:")
+	// fmt.Println(APSPFaster)
 }

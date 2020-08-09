@@ -337,9 +337,9 @@ The FW algo also uses dynamic-programming, but uses a different structure of a s
 
 The FW algo considers the "intermediate" vertices of a shortest path p=<v1, v2,...,vl>; that is, all vertices other than v1 and vl.
 We rely on the following observation: 
- - asssuming the vertices of graph G are V={1,2,...,n}, let us consider a subset {1,2,...,k} of vertices for some k.
+ - assuming the vertices of graph G are V={1,2,...,n}, let us consider a subset {1,2,...,k} of vertices for some k.
  - For any pair of vertices i,j in V, consider all paths from i to j whose intermediate vertices are all drawn from {1,2,...,k}, and let p be a minimum-weight path from among them.
- - The FW algo exploits a relationship between path p and shortest paths from i to j with all intermediate vertices in the set {1,2,...,k-1}. The relationship depends on whether or not k is an intermdiate vertex of path p:
+ - The FW algo exploits a relationship between path p and shortest paths from i to j with all intermediate vertices in the set {1,2,...,k-1}. The relationship depends on whether or not k is an intermediate vertex of path p:
    - if k is not an intermediate vertex of path p, all intermediate vertices of path p are in the set {1,2,...,k-1}. Thus, a shortest path from i to j with all intermdiate vertices in {1,2,...,k-1} is also the shortest path from i to j with all intermdiate vertices in {1,2,...,k}.
    - if k is an intermediate vertex of path p, we decompose p into p1 and p2, where p1 is a shortest path from i to k with intermediate vertices in the set {1,2,...,k-1} and p2 is a shortest path from k to j with intermediate vertices in the set {1,2,...,k-1}.
 
@@ -365,7 +365,7 @@ When k>1, π(k)ij =
   - π(k-1)ij if d(k-1)ij <= d(k-1)ik + d(k-1)kj
     no change since adding vertex k to the set of allowed intermdiate vertices
   - π(k-1)kj if d(k-1)ij > d(k-1)ik + d(k-1)kj
-    shortest path has change since adding vertex k to the set of allowed intermdiate vertices. The predecessor to j is thus the same as the predecessor to j on a shortest path from k->j. We know this value already exists in π, since k is not an intermediate vertex on the path k->j. Clever!
+    shortest path has changed since adding vertex k to the set of allowed intermdiate vertices. The predecessor to j is thus the same as the predecessor to j on a shortest path from k->j. We know this value already exists in π, since k is not an intermediate vertex on the path k->j. Clever!
 
 -=- Transitive closure of a directed graph
 It may be useful to know whether a path exists between any 2 vertices on a directed graph G.
@@ -377,7 +377,7 @@ For i,j,k=1,2,...,n, we define t(k)ij to be true if there exists a path from i->
 A recursive definition of t(k)ij is:
   for k=0, t(0)ij=
     0 if i != j and no edge exists between i and j
-    i if i == j or an edge exists between i and j
+    1 if i == j or an edge exists between i and j
   for k>0, t(k)ij = t(k-1)ij || (t(k-1)ik && t(k-1)kj)
     that is, t(k)ij will be true if either t(k-1)ij is true, or if t(k-1)ik=true and t(k-1)kj=true (a path exists between i and k, and between k and j).
 

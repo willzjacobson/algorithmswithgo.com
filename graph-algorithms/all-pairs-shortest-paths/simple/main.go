@@ -20,22 +20,17 @@ func extendShortestPaths(m helpers.AdjacencyMatrix, w helpers.AdjacencyMatrix) h
 	// generate a new matrix that will contain the extended shortest paths
 	n := len(m)
 	mNext := helpers.GenerateNewMatrix(n, math.Inf(1))
-	fmt.Println("-=- GO", m[4])
+
 	// determine the value of each entry of the new shortest paths matrix (requies 3 nested loops, like matrix multiplication)
-	for i := 4; i < n; i++ {
+	for i := 0; i < n; i++ {
 		for j := 0; j < n; j++ {
 			for k := 0; k < n; k++ {
 				// The value is the min of the previous shortest path weight (if one exists)
 				// and the path weight generated using all possible predecessors of j
-				mNext[i][j] = math.Min(m[i][j], mNext[i][k]+w[k][j])
-				if j == 0 {
-					fmt.Println("HELLO from ", k, m[i][j], mNext[i][k]+w[k][j], mNext[i][j])
-				}
-				// fmt.Println(i, j, k, "| was:", m[i][j], "now:", mNext[i][j])
+				mNext[i][j] = math.Min(mNext[i][j], m[i][k]+w[k][j])
 			}
 		}
 	}
-	fmt.Println("should be 8:", mNext[4][0])
 	return mNext
 }
 
@@ -47,8 +42,6 @@ func slowAllPairsShortestPaths(w helpers.AdjacencyMatrix) helpers.AdjacencyMatri
 	// and w already gives us the all-pairs shortest-paths matrix for m=1)
 	for i := 2; i < n; i++ {
 		m = extendShortestPaths(m, w)
-		fmt.Println("AFTER ROUND", n-2, ": ", m[4])
-		break
 	}
 	return m
 }
@@ -58,8 +51,8 @@ func fasterAllPairsShortestPaths(w helpers.AdjacencyMatrix) helpers.AdjacencyMat
 	n := len(w)
 	m := w
 	kk := 1
-	// This time, loop until m > n-1, doubling m each time through the loop
-	// Total of lg n-1 rounds, which is better than n-2
+	// This time, loop until kk > n-1, doubling kk each time through the loop
+	// Total of lg n-1 rounds, which is better than n-2 rounds if n is reasonably large
 	for kk < n-1 {
 		m = extendShortestPaths(m, m)
 		kk *= 2
@@ -74,7 +67,7 @@ func main() {
 	fmt.Println("-=- result from O(V^4) algorithm:")
 	fmt.Println(APSPSlow)
 	fmt.Println("-=-=-=-")
-	// APSPFaster := fasterAllPairsShortestPaths(w)
-	// fmt.Println("-=- result from O(lgV V^3) algorithm:")
-	// fmt.Println(APSPFaster)
+	APSPFaster := fasterAllPairsShortestPaths(w)
+	fmt.Println("-=- result from O(lgV V^3) algorithm:")
+	fmt.Println(APSPFaster)
 }

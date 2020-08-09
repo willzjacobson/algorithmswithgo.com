@@ -29,7 +29,7 @@ func constructPredecessorSubgraph(dkMin1 helpers.AdjacencyMatrix, dk helpers.Adj
 						π[i][j] = float64(i)
 					}
 				} else {
-					//
+					// new predecessor of j in the path i->j is the same as the predecessor of j in the path k->j
 					π[i][j] = π[k][j]
 				}
 			}
@@ -67,7 +67,7 @@ func FloydWarshall(w helpers.AdjacencyMatrix) (helpers.AdjacencyMatrix, helpers.
 		dk = d // update latest shortest-paths matrix
 	}
 
-	// return both the shortest-paths matric and the predeccessor graph
+	// return both the shortest-paths matrix and the predeccessor graph
 	return dk, πk
 }
 

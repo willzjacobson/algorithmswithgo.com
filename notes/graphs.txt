@@ -311,53 +311,53 @@ It then performs n-2 loops, extending the shortest paths computed so far by 1 ed
 EXTEND-SHORTEST-PATHS(L,W) takes the previous shortest paths matrix L(m), which contains all shortest paths of maximum length m, and uses W to compute L(m+1).
 We do this n-1 times, since all shortest paths will have at most n-1 edges if G contains no negative weight cycles.
 EXTEND-SHORTEST-PATHS builds the next L(m) from W and L(m-1) using this key operation:
-  l(m)ij = min(l(m-1)ij, l(m-1)ik + wkj), where for k we try all possible predecessors of vertex j.
+  l(m)ij = min(l(m)ij, l(m-1)ik + wkj), where for k we try all possible predecessors of vertex j.
 The EXTEND-SHORTEST-PATHS operation resembles matrix multiplaction in its triple nested loop structure, and runs in O(V^3). Looping through it |V| times this takes O(V^4) time.
 
 Improving the O(V^4) Implementation
-We don't actually want all the L(m) matrices; we only really care about L(n-1).
-Due to the similarity between EXTEND-SHORTEST-PATHS and matrix multiplaction, we can sort of summarize our algo thus far like this:
+We don't actually want all the L(m) matrices along the way to L(n-1); we only really care about L(n-1). There is a faster way to get to L(n-1) than going L(1), L(2)...
+Due to the similarity between EXTEND-SHORTEST-PATHS and matrix multiplication, we can sort of summarize our algo thus far like this:
   L(1) = L(0) * W = W
   L(2) = L(1) * W = W2
   L(3) = L(2) * W = W3
   ...
   L(n-1) = L(n-2) * W = Wn-1
-Just as traditional matrix multiplication is associative, so is the matrix operation defined by EXTEND-SHORTEST-PATHS. We cat therefore compute L(n-1) with only lg(n-1) matrix products via the sequence:
+Just as traditional matrix multiplication is associative, so is the matrix operation defined by EXTEND-SHORTEST-PATHS. We can therefore compute L(n-1) with only lg(n-1) matrix products via the sequence:
   L(1) = W
   L(2) = W * W
   L(4) = W2 * W2
   L(8) = W4 * W4
   ...
-etc. up until m >= n-1. This technique is called "repeated sqauring". (see example implementation in this repo).
+etc. up until m >= n-1. This technique is called "repeated squaring". (see example implementation in this repo).
 This gives us a running time of O(lg v V^3).
 
 -=- Floyd-Warshall algorithm
-Like the algo laid out above, we assume a directed graph G-(V,E) that can have negative weight edges, but no negative weight cycles.
+Like the algo laid out above, we assume a directed graph G=(V,E) that can have negative weight edges, but no negative weight cycles.
 The FW algo also uses dynamic-programming, but uses a different structure of a shortest path and runs in O(V^3) time.
 
-The FW algo considers the "intermediate" vertices of a shortest path p=<v1, v2,...,vl>; that is, all vertexes other than v1 and vl.
+The FW algo considers the "intermediate" vertices of a shortest path p=<v1, v2,...,vl>; that is, all vertices other than v1 and vl.
 We rely on the following observation: 
  - asssuming the vertices of graph G are V={1,2,...,n}, let us consider a subset {1,2,...,k} of vertices for some k.
- - For any pair of vertices i,j in V, consuder all paths from i to j whose intermediate vertices are all drawn from {1,2,...,k}, and let p be a minimum-weight path from among them.
+ - For any pair of vertices i,j in V, consider all paths from i to j whose intermediate vertices are all drawn from {1,2,...,k}, and let p be a minimum-weight path from among them.
  - The FW algo exploits a relationship between path p and shortest paths from i to j with all intermediate vertices in the set {1,2,...,k-1}. The relationship depends on whether or not k is an intermdiate vertex of path p:
    - if k is not an intermediate vertex of path p, all intermediate vertices of path p are in the set {1,2,...,k-1}. Thus, a shortest path from i to j with all intermdiate vertices in {1,2,...,k-1} is also the shortest path from i to j with all intermdiate vertices in {1,2,...,k}.
    - if k is an intermediate vertex of path p, we decompose p into p1 and p2, where p1 is a shortest path from i to k with intermediate vertices in the set {1,2,...,k-1} and p2 is a shortest path from k to j with intermediate vertices in the set {1,2,...,k-1}.
 
 We now create a recursive solution from the above observations.
-lLt d(k)ij be the weight of a shortest path from vertex i to vertex j for which all intermdiate vertices are in the set {1,2,...,k}.
-When k=0, the path has no intermdiate edges. Hence, d(o)ij = wij.
+Let d(k)ij be the weight of a shortest path from vertex i to vertex j for which all intermediate vertices are in the set {1,2,...,k}.
+When k=0, the path has no intermediate edges. Hence, d(0)ij = wij.
 When k>0, we define d(k)ij recursively as min(d(k-1)ij, d(k-1)ik + wkj).
 Since for any path, all intermdiate vertices are in the set {1,2,...,n}, the matrix D(n)=(d(n)ij) gives the final answer: d(n)ij=𝛿(i,j) for all i,j in V.
 
 Computing shortest-path weights bottom-up
-Based on the above recursive equation, we can copute the values d(k)ij in order of increasing values of k.
+Based on the above recursive equation, we can compute the values d(k)ij in order of increasing values of k.
 The input of the procedure FLOYD-WARSHALL(W) is an nxn matrix W. The output is the matrix D(n) of shortest path weights.
 Due to thrice nested loop, running time of the FW algo is O(V^3). The constant cost is low, often making FW a good choice even for small data sets.
 (see example implementation in this repo).
 
 Reconstructing shortest paths
 In our FW implementation, we also compute a sequence of matrices π(0),π(1),...,π(n), where π=π(n). 
-We define π(k)ij as the predecessor of vertex j on a shortest path from vertex i with all intermediate vertices in the set {1,2,...,k}.
+We define π(k)ij as the predecessor of vertex j on a shortest path from vertex i to vertex j with all intermediate vertices in the set {1,2,...,k}.
 When k=0:
   - if i=j or there is no path from i to j with all intermediate vertices in the set {1,2,...,k}, π(k)ij = nil.
   - if i != j and there is a path from i to j with all intermediate vertices in the set {1,2,...,k}, π(k)ij = i.
@@ -369,16 +369,16 @@ When k>1, π(k)ij =
 
 -=- Transitive closure of a directed graph
 It may be useful to know whether a path exists between any 2 vertices on a directed graph G.
-We define the "transitive closure" of G as G*=(V,E*), where E* is the set of all edges (i,j) where a path exists from vertex it to vertex j in G.
+We define the "transitive closure" of G as G*=(V,E*), where E* is the set of all edges (i,j) where a path exists from vertex i to vertex j in G.
 One way to compute G* in O(V^3) time is to assign a weight of 1 to each edge and run the FW algo. If there is a path from i->j, we get dij<n. Otherwise, dij=∞.
 
 However, there exists another O(V^3) method that is often faster in practice, since it uses booleans and logical operators rather than numbers and arithmetic.
-For i,j,k=1,2,...,n, we define t(j)ij to be true if there exists a path from i->j with all intermediate vertices in the set {1,2,...,k}, and false otherwise.
+For i,j,k=1,2,...,n, we define t(k)ij to be true if there exists a path from i->j with all intermediate vertices in the set {1,2,...,k}, and false otherwise.
 A recursive definition of t(k)ij is:
   for k=0, t(0)ij=
     0 if i != j and no edge exists between i and j
     i if i == j or an edge exists between i and j
-  for k>0, t(k)ij = t(k-1)ij || t(k-1)ik && t(k-1)kj
+  for k>0, t(k)ij = t(k-1)ij || (t(k-1)ik && t(k-1)kj)
     that is, t(k)ij will be true if either t(k-1)ij is true, or if t(k-1)ik=true and t(k-1)kj=true (a path exists between i and k, and between k and j).
 
 -=- Johnson's algorithm for sparse graphs

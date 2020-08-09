@@ -42,6 +42,27 @@ func buildWeightedAdjList() *adjacencylist.Weighted {
 	return l
 }
 
+// this set of vertices is just used to show that Dijkstra's algo won't work with negative edge weights
+var (
+	a = adjacencylist.CreateAdjListVertex("a")
+	b = adjacencylist.CreateAdjListVertex("b")
+	c = adjacencylist.CreateAdjListVertex("c")
+)
+
+func buildBadWeightedAdjList() *adjacencylist.Weighted {
+	// create adjacency list
+	l := adjacencylist.CreateWeighted()
+	// establish edges
+	l.Adj[a] = []*adjacencylist.AdjListEdgeWeighted{
+		adjacencylist.CreateAdjListEdgeWeighted(b, 5),
+		adjacencylist.CreateAdjListEdgeWeighted(c, 2),
+	}
+	l.Adj[b] = []*adjacencylist.AdjListEdgeWeighted{
+		adjacencylist.CreateAdjListEdgeWeighted(c, -10), // BAD
+	}
+	return l
+}
+
 // PrintShortestPath : helper to show the shortest path from the source vertex to any vertex v
 func PrintShortestPath(s *adjacencylist.AdjListVertex, v *adjacencylist.AdjListVertex) {
 	if v == s {
@@ -68,4 +89,8 @@ func main() {
 	PrintShortestPath(s, x)
 	PrintShortestPath(s, y)
 	PrintShortestPath(s, z)
+
+	// demo of Dijkstra's Algorithm failing for negative edge weights
+	// lBad := buildBadWeightedAdjList()
+	// dijkstra.Dijkstra(lBad, a)
 }

@@ -7,7 +7,7 @@ import "fmt"
 
 	This problem has optimal substructure for dynamic programming. However, we can actually choose an activity to add to our optimal solution without solving all the subproblems. For this problem, we only need to consider 1 choice: the greedy choice. At each juncture, we can simply select the activity that has the earliest finish time. At the start, we select a1, since they are sorted by finish time. Our only subproblem, then, is to find that activity within the subset of activities that start after the previously selected one finishes.
 
-	A greedy algo like this does now need to work bottom up, filling in a table as it goes. It can work top down, adding to an optimal solution, then doing the same for subproblems of decreasing size.
+	A greedy algo like this does not need to work bottom up, filling in a table as it goes. It can work top down, adding to an optimal solution, then doing the same for subproblems of decreasing size.
 */
 
 // RecursiveGreedyActivitySelector : recursive, top-down approach
@@ -26,7 +26,6 @@ func RecursiveGreedyActivitySelector(s, f []int, lastActivityIndexChosen, numAct
 
 	// recursvely build the solution
 	if nextActivityIndex < numActivities {
-		// fmt.Println("going again", nextActivityIndex)
 		return append([]int{nextActivityIndex}, RecursiveGreedyActivitySelector(s, f, nextActivityIndex, numActivities)...)
 	}
 

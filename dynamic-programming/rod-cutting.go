@@ -15,7 +15,7 @@ import (
 
 /*
 CutRodRecursive : Recursive solution using divide-and-conquer methodology.
-Takes an input p[0:n] pf prices and an integer n (length of the rod).
+Takes an input p[0:n] of prices and an integer n (length of the rod).
 Returns the maximum possible revenue for a rod of length n.
 This is what we'd call a "top down" approach, since we start with the full rod (the full problem) and break it down into parts
 */
@@ -42,7 +42,7 @@ func CutRodRecursive(p []int, n int) int {
 
 // CutRodTopDown : "top-down with memoization"
 // Store the resulting max for a rod of length i whenever it's encountered
-// O(n) due to having ~n recursive calls (that return values from the cache) in each round of the loop
+// O(n^2) due to having ~n recursive calls (that return values from the cache) in each round of the loop
 func CutRodTopDown(p []int, n int) int {
 	cache := map[int]int{}
 	for i := 0; i <= n; i++ {
@@ -72,7 +72,7 @@ func CutRodTopDownAux(p []int, n int, c map[int]int) int {
 	return q
 }
 
-// CutRodBottomUp : Top-down with memoization
+// CutRodBottomUp : Bottom-up approach with dynamic-programming
 // This approach requires some notion of the "size" of a subproblem, such that solving any particular subproblem depends only on solving "smaller" subproblems.
 // This method generally has better constant factors, since it has less overhead for procedure calls
 // O(n^2) due to nested loop. There are n subproblems to solve (length from 1-n), and each one takes O(n) time.

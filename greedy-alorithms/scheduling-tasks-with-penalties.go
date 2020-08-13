@@ -5,14 +5,14 @@ import "fmt"
 /*
 	given a list of tasks that:
 	 - each take unit time
-	 - each have a deadline of when they should be complete
-	 - each have a penalty for if they are not completed on time
+	 - each a a deadline of when it should be complete
+	 - each has a penalty for if it are not completed on time
 	create an algorithm to schedule the tasks so as to incur the minimum total penalty.
 
 	Basically, we're looking for the optimal subset of a "weighted matroid" (weighted because each task has a weight).
-	This optimal set will be the set of tasks that are completed on time (and thus as a result, the penalties incurred for the laste tasks will be minimized)
+	This optimal set will be the set of tasks that are completed on time (and thus as a result, the penalties incurred for the late tasks will be minimized)
 	Since all weights are positive, the optimal subset is by definition also a maximal subset (as many tasks as can be crammed in).
-	In this case, we say that a set of tasks A is independent if there is a way to scedule the tasks such that none are late.
+	In this case, we say that a set of tasks A is independent if there is a way to schedule the tasks such that none are late.
 
 	In this example, the tasks are in order of decreasing weights. If they were not already in this order, we'd have to order them that way in order to use a greedy algo.
 */
@@ -24,12 +24,12 @@ type Task struct {
 	penalty int
 }
 
-// GreedyTaskScheduler : Greedy algorithm to determine optimal order of tasks to incur loweat total penalty for late tasks
+// GreedyTaskScheduler : Greedy algorithm to determine optimal order of tasks to incur lowest total penalty for late tasks
 // returns: task order, number tasks completed on time, total late penalty incurred
 func GreedyTaskScheduler(tasks []Task) ([]Task, int, int) {
 	optimalIndependentSetOfTasks := []Task{}
 	remainingTasks := []Task{}
-	suOfLatePenalties := 0
+	sumOfLatePenalties := 0
 
 	for _, t := range tasks {
 		// only add this task to the list of optimal tasks if, when this task is added, all the tasks in the list can be completed by their deadlines
@@ -55,14 +55,14 @@ func GreedyTaskScheduler(tasks []Task) ([]Task, int, int) {
 		} else {
 			// this task didn't make the cut
 			remainingTasks = append(remainingTasks, t)
-			suOfLatePenalties += t.penalty
+			sumOfLatePenalties += t.penalty
 		}
 	}
 
 	// concatinate the optimal set of tasks with the set of remaining tasks into an order of operations (order of the optimal matters, order of the remaining does not)
 	taskOrder := append(optimalIndependentSetOfTasks, remainingTasks...)
 
-	return taskOrder, len(optimalIndependentSetOfTasks), suOfLatePenalties
+	return taskOrder, len(optimalIndependentSetOfTasks), sumOfLatePenalties
 }
 
 // GreedyTaskSchedulerFaster : another greedy implementation that performs slightly faster than GreedyTaskScheduler
@@ -79,7 +79,7 @@ func GreedyTaskSchedulerFaster(tasks []Task) ([]Task, int, int) {
 	for _, t := range tasks {
 		placed := false
 		// starting the loop at 'deadline-1' rather than 'deadline' since we index slices starting at 0; can only fit 1 task in before t=1, not 2 tasks
-		for j := t.dealine - 1; j >= 0 && placed == false; j-- {
+		for j := t.dealine - 1; j >= 0 && !placed; j-- {
 			if order[j].id == -1 {
 				order[j] = t
 				placed = true
@@ -87,7 +87,7 @@ func GreedyTaskSchedulerFaster(tasks []Task) ([]Task, int, int) {
 			}
 		}
 
-		if placed == false {
+		if !placed {
 			for j := len(order) - 1; j >= t.dealine; j-- {
 				if order[j].id == -1 {
 					order[j] = t

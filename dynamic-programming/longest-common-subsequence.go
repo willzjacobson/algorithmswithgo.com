@@ -38,7 +38,7 @@ func LongestSubstring(X, Y string) ([][]int, [][]string) {
 
 	for i, x := range X {
 		for j, y := range Y {
-			// All the '+1' stuff is to account for indexing starting at 0, while maintaing a 0th row and column in the table before teh string starts
+			// All the '+1' stuff is to account for indexing starting at 0, while maintaing a 0th row and column in the table before the string starts
 			if x == y {
 				c[i+1][j+1] = c[i][j] + 1
 				b[i+1][j+1] = leftUp

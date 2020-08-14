@@ -10,11 +10,11 @@ The expected cost of a search is the sum of the (depth of each node +1) * the pr
 See P.401 of Intro To Algorithms to see how to represent this mathamatically.
 */
 
-// OptimalBST : Determine the lowest cost binary search tree, given a list of nodes and the probabilities of needing to look up
+// OptimalBST : Determine the lowest cost binary search tree, given a list of nodes and the probabilities of needing to look each up
 func OptimalBST(p, q []float32) ([][]float32, [][]int) {
 	n := len(p)
 	c := make([][]float32, n+1) // table to hold the minimum cost for each subtree
-	w := make([][]float32, n+1) // table to hold the sum of the probabilities of all the nodes in a subtree (used in calculations fo table c)
+	w := make([][]float32, n+1) // table to hold the sum of the probabilities of all the nodes in a subtree (used in calculations for table c)
 	root := make([][]int, n)    // table to hold root node resulting in the minimum cost for subtree
 	for i := 0; i <= n; i++ {
 		for j := 0; j <= n; j++ {
@@ -37,11 +37,11 @@ func OptimalBST(p, q []float32) ([][]float32, [][]int) {
 			w[i-1][j] = w[i-1][j-1] + p[j-1] + q[j] // calculating sum of probabilities of nodes using that of this subtree minus this node, plus the probability of node p[j] and all nodes between p[j] and p[j+1]
 
 			for r := i; r <= j; r++ { // trying out different roots for this subtree to see which yields optimal cost
-				q := c[i-1][r-1] + c[r][j] + w[i-1][j] // calculate expected cost for subtree if we make p[r] the root
+				t := c[i-1][r-1] + c[r][j] + w[i-1][j] // calculate expected cost for subtree if we make p[r] the root
 
 				// if cost is best so far, use p[r] as the root for this subtree
-				if c[i-1][j] == 0 || q < c[i-1][j] {
-					c[i-1][j] = q
+				if c[i-1][j] == 0 || t < c[i-1][j] {
+					c[i-1][j] = t
 					root[i-1][j-1] = r
 				}
 			}
@@ -52,7 +52,7 @@ func OptimalBST(p, q []float32) ([][]float32, [][]int) {
 	return c, root
 }
 
-// ConstructOptimalBST : Given the optomal root nodes for the subtrees, prints out the tree node by node.
+// ConstructOptimalBST : Given the optimal root nodes for the subtrees, prints out the tree node by node.
 // UNFINISHED
 func ConstructOptimalBST(root [][]int, i, j int) {
 	r := root[i][j]

@@ -182,7 +182,7 @@ RELAX(u, v, w)  // O(1) time
 Relaxation is the only means by which shortest-path estimates and predecessors change (though various algorithms we'll cover differ in how many times they might relax a given egde).
 
 Properties of shortest paths and relaxation (formally proven in section 24.5)
- - Triangle inequality: for an edge (u,v) in E, we have 𝛿(s,v) <= 𝛿(u,v) + w(u,v)
+ - Triangle inequality: for an edge (u,v) in E, we have 𝛿(s,v) <= 𝛿(s,u) + w(u,v)
  - Upper-bound property: We always have v.d >= 𝛿(s,v) for all vertices v in V, and once v.d achieves the value 𝛿(s,v), it never changes.
  - No-path property: If there is no path from s to v, then we always have v.d = 𝛿(s,v) = ∞.
  - Convergence property: If s -> u -> v is a shortest path in G for some u,v in V, and if u.d = 𝛿(s,u) at any time prior to relaxing edge (u,v), then v.d = 𝛿(s,v) at all times afterward.

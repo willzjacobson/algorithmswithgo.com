@@ -4,9 +4,9 @@ import (
 	"fmt"
 )
 
-// BucketSort will sort a list of integers using the counting sort algorithm.
+// BucketSort will sort a list of integers using the bucket sort algorithm.
 //
-// Big O: O(n^2) (average case is O(n) if uniformly sorted data)
+// Big O: average case is O(n), worst case is O(n^2) (if all data falls in 1 bucket)
 func BucketSort(nums []float32) {
 	if len(nums) < 2 {
 		return
@@ -16,10 +16,9 @@ func BucketSort(nums []float32) {
 	b := make([][]float32, len(nums))
 
 	for _, v := range nums {
-		listInd := len(nums) * int(v)
+		listInd := int(float32(len(nums)) * v)
 		b[listInd] = append(b[listInd], v)
 	}
-
 	for i := range b {
 		InsertionSortIntBrute(b[i])
 		out = append(out, b[i]...)

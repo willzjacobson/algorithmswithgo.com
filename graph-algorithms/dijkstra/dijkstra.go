@@ -8,7 +8,7 @@ import (
 
 // helper functions
 
-// InitSingleSource : set up adjacency-list for Bellman-Ford algo
+// InitSingleSource : set up adjacency-list
 func InitSingleSource(l *adjacencylist.Weighted, s *adjacencylist.AdjListVertex) {
 	for u := range l.Adj {
 		u.D = math.Inf(1)

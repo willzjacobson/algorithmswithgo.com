@@ -54,7 +54,7 @@ Some processors have hardware support for context-switching, which sounds faster
   1) Multitasking: one process being switched out of the CPU so another can run. This can be triggered by:
     - a process making itself unrunnable, such as when waiting for an I/O or synchronization operation to complete.
     - a preemptive scheduler triggering a timer interrupt when a process exceeds its time slice.
-  2) Interrup handling: if the CPU requests data from disk or an HTTP request (for example), rather than busy-waiting until a response is received, it can issue the request and continue on with some other execution. When the data is fetched, the CPU can be interrupted and presented with the data, so the initial process or thread can continue.
+  2) Interrupt handling: if the CPU requests data from disk or an HTTP request (for example), rather than busy-waiting until a response is received, it can issue the request and continue on with some other execution. When the data is fetched, the CPU can be interrupted and presented with the data, so the initial process or thread can continue.
   3) User and kernel mode switching. This only requires a context switch on some OS's.
 Steps:
  - State of the current process must be stored, so it can be resumed. Process state includes any registers it is using, memory heaps, the program counter, and other OS-specific data. This process state is stored in a data structure called "process control block" (PCB), which is stored on a per-process stack in kernel memory.

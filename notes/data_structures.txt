@@ -121,7 +121,7 @@ repeat
 until T[j] == nil or i == m
 return nil
 -= Deletion is difficult, since if we replace an element with nil, the sequence traversed when searching for another element could break. Thus, we use a value other than nil to indicate "deleted". However, this make search times no longer depend on the load factor. That's why chaining is more commonly used when we need deletion functionality. 
-For open addressing to work, we assume "uniform hashing": the probe sequence of each key is equally likely to me any of the m! permitations of {0,1,...,m-1}. This extends "simple uniform hashing" from above to define a hash function that produces not just a single number, but a sequence of numbers.
+For open addressing to work, we assume "uniform hashing": the probe sequence of each key is equally likely to be any of the m! permitations of {0,1,...,m-1}. This extends "simple uniform hashing" from above to define a hash function that produces not just a single number, but a sequence of numbers.
 True uniform hashing is hard. 3 common techniques for comupting probe sequences for open addressing are: linear probing, quadratic probing, and double hashing. Double hashing seems to work best. 
 -=- analysis of open addressing (assuming uniform hashing)
 Given an open-address hash table with load factor a = n/m < 1, the expected number of probes in an unsuccessful search is at most 1/(1-a). That's 2n a half full table, 10 in a table 90% full.
@@ -308,7 +308,7 @@ Each node contains the data:
 new operation: find a node that overlaps with a given interval
 INTERVAL-SEARCH(T,i) // find a node in tree T whose interval overlaps interval i
   x = T.root
-  while x != T.nil && !(x.int.low <= i.high && i.low <= x.int.high) // continue while x exists and x.int does not overlap with interval i
+  while x != T.nil && !(x.int.low <= i.high && i.low <= x.int.high)  // continue while x exists and x.int does not overlap with interval i
     if x.left !== T.nil && x.left.max >= i.low
       x = x.left
     else x = x.right

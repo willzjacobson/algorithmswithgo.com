@@ -106,7 +106,7 @@ Is radix sort faster than quicksort? Sometimes. But the constants are higher in 
 UNABLE TO IMPLEMENT -- RETURN TO THIS
 
 Bucket Sort
-Assumes the unput is drawn from a uniform distribution between 0 and 1 (I assume you could normalize data that is of uniform distribution but not between 0 and 1) (this assumption allows it to be fast).
+Assumes the input is drawn from a uniform distribution between 0 and 1 (I assume you could normalize data that is of uniform distribution but not between 0 and 1) (this assumption allows it to be fast).
 O(n^2) worst case (basically becomes worst case insertion sort)
 O(n) average case
 Even if the input is not of uniform distribution, bucket sort will still run in linear time if the sum of the squares of the bucket sizes is linear in the total number of elements. 

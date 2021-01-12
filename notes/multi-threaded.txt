@@ -36,7 +36,7 @@ Performance measures
  - the "span" is the longest time to execute the strands along any path in the dag. If each strand takes unit time, the span is the number of vertices along the longest (critical path). We can find the critical path of a dag in O(V+E) time (from ch. 24). The span is the running time if each strand could be run on its own processor, denoted by T∞.
  - The lower bound of the running time of a multithreaded algo is controlled by the span (which is T∞). 
     For example, for the recursive form of Fib, Fib(n-1) and Fib(n-2) run in parallel, so T∞ = max(T∞(n-1), T∞(n-2))+ O(1) = T∞(n-1)+ O(1).
- - To denote running time of a multithreaded computation of preprocessors, we use Tp.
+ - To denote running time of a multithreaded computation of p processors, we use Tp.
 Work and span provide lower bounds on Tp.
   Work Law: Tp >= T1/P, since P processors can do at most P units of work at a time.
   Span Law: Tp >= T∞, since you can't do any better than a machine with ∞ processors.

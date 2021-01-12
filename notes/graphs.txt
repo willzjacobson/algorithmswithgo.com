@@ -40,7 +40,7 @@ Works on directed and undirected graphs.
 Search "deeper" in the graph whenever possible:
   - Explores edges out of the most recently discovered vertex v that still has unexplored edges leaving it. 
   - Whenever a vertex v is discovered, we set v.P to the vertex from which it is discovered (as in BFS).
-  - Once all of v's edges are explored, the seaerch "backtracks" to explore edges from the vertex from which v discovered. 
+  - Once all of v's edges are explored, the search "backtracks" to explore edges from the vertex from which v discovered. 
   - This continues until we have reached all vertices reachable from the original source vertex. 
   - If any undiscovered vertices remain, we repeat the process for them until every vertex has been discovered.
   - Like BFS, we use the colors to keep track of where we've been, so each node only gets added to 1 tree.
@@ -273,7 +273,7 @@ A*(start, goal, h)   // h is heuristic function
   return FAIL  // q is empty but goal never reached
 
 -=- All-Pairs Shortest Paths
-Here we consider the problem of, given a weighted, directed graph, finding shortest paths between all pairs of vertices in a graph. For example, making a table of distances between all paris of cities for a road atlas. 
+Here we consider the problem of, given a weighted, directed graph, finding shortest paths between all pairs of vertices in a graph. For example, making a table of distances between all pairs of cities for a road atlas. 
 In these problems we typically want the output in tabular form: the entry in u's row and v's column should be the weight of a shortest path from u to v.
 We can solve these problems by running single-source shortest-paths algos |V| times. 
 If all edge weights are nonnegative, we can use Dijkstra's algo:

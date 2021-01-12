@@ -12,7 +12,7 @@ A string over a finite set S is a sequence of elements of S. For example, there 
 A string of length k is a k-string.
 A substring s' of a string s is an ordered sequence of consecutive elements of s.
 -=-=-=-
-A k-substring of a string is a substring of a string of length k. For example, 010 is a 3-substring of 01101001 (the substring begins at position 4).
+A k-substring of a string is a substring of length k of a longer string. For example, 010 is a 3-substring of 01101001 (the substring begins at position 4).
 -=-=-=-
 There are |S|^k strings of length k. For example, the number of binary k-strings is 2^k. To construct a k-string over an n-set, we have n ways to pick the first element, n ways to pick the 2nd, etc. Thus, n^2 possible strings.
 
